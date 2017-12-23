@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>申请账单付款 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane">
+        <h3 style="margin-bottom:10px;">请选择所要申请付款的账单</h3>
+        <div class="layui-input-inline">
+          <label class="layui-form-label">结算单位</label>
+          <div class="layui-input-inline">
+            <input type="text" name="targetName" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">单位属性</label>
+          <div class="layui-input-inline">
+            <select name="auditStatusRemarks">
+              <option value="" selected="selected">全部</option>
+              <option value="1">供应商</option>
+              <option value="2">员工</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">账期</label>
+          <div class="layui-input-inline">
+            <input type="text" name="billMonth" id="billMonth" placeholder="" class="layui-input">
+          </div>
+        </div>
+        <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+      </form>
+    </div>
+    <!--end: 搜索-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar" style="text-align:center; margin-top:20px; margin-bottom:50px;">
+      <button class="layui-btn layui-btn-normal" data-type="apply" style="width:150px; margin-right:10px !important;">立即申请</button>
+      <button class="layui-btn layui-btn-primary" data-type="cancel" style="width:150px;">取消</button>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'laydate', 'table', 'tms_tab'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#billMonth'
+      ,type: 'month'
+    });
+    setTableData();
+    
+    //监听提交
+    form.on('submit(search)', function(data){
+      var $targetName = $.trim(data.field.targetName),
+      $billMonth = $.trim(data.field.billMonth);
+      setTableData($targetName, $billMonth);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($targetName, $billMonth, $auditStatusRemarks){
+      typeof $targetName != 'undefined' ? $targetName = $targetName : $targetName = '';
+      typeof $billMonth != 'undefined' ? $billMonth = $billMonth : $billMonth = '';
+      var $pageSize = 15;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/handleBills/queryAsk.shtml',
+        method: 'post',
+        where: {targetName: $targetName,billMonth: $billMonth},
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'targetName', title: '结算单位', width:120},
+          {field:'targetType', title: '单位属性', width:120, templet:'#targetTypeTpl'},
+          {field:'billNo', title: '账单号', width:120},
+          {field:'billMonth', title: '月份', width:120, templet:'#billMonthTpl'},
+          {field:'orderCount', title: '运输单量', width:120},
+          {field:'arkCount', title: '运输柜量', width:120},
+          {field:'transportCost', title: '运费', width:120},
+          {field:'extraCost', title: '异常费', width:120},
+          {field:'totalCost', title: '合计', width:120}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    var active = {
+      //立即申请
+      apply: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能申请一条数据！');
+        }else{
+          $.ajax({
+            type:"GET", 
+            url:"/ucenter/general/finance/askPrice/askPrice.shtml?billId=" + data[0].id,
+            dataType:"json",      
+            contentType:"application/json",
+            success:function(d){
+              var $code = d.code,
+                  $msg = d.msg,
+                  $objects = d.objects;
+                 
+              if($code === 'SUCCESS'){
+                parent.layer.alert("申请成功", {
+                  closeBtn: 0,
+                  yes: function(index){
+                    parent.layer.close(index);
+                    $(window.parent['f1'].document).find('.btn-search').click();
+                    tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+                  }
+                });
+              }else{
+                parent.layer.alert('申请失败');
+                return false;
+              }
+            }
+          });
+        }
+      },
+      //取消
+      cancel: function(){
+        tmsTab.del($(window.parent.document).find('.layui-tab-title li.layui-this').attr('lay-id'));
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+  <script type="text/html" id="targetTypeTpl">
+    {{#  if(d.targetType == '1'){ }}
+      供应商
+    {{#  } else if(d.targetType == '2'){ }}
+      员工
+    {{#  } else if(d.targetType == '3'){ }}
+      客户
+    {{#  } }}
+  </script>
+  <script type="text/html" id="billMonthTpl">
+    {{d.billMonth != null ? new Date(d.billMonth).format("yyyy-MM") : ""}}
+  </script>
+</html>

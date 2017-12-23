@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>反核销费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+      <!--end:表格列表-->
+    </form>
+    <div class="layui-form-item btns-bar" style="text-align:center;">
+      <button class="layui-btn layui-btn-normal" data-type="reversechargeoff" lay-filter="submit" style="width:150px;">反核销</button>
+      <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">返回</button>
+    </div>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    setTableData();
+
+    //方法级渲染
+    function setTableData($clientName, $paymend, $status){
+      typeof $clientName != 'undefined' ? $clientName = $clientName : $clientName = '';
+      typeof $paymend != 'undefined' ? $paymend = $paymend : $paymend = '';
+      typeof $status != 'undefined' ? $status = $status : $status = '';
+      var $pageSize = 15;
+      var $orderId = $.trim(getUrlParam('id'));
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/general/finance/revenueRecord/search.shtml?orderId=' + $orderId,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total', //数据总数的字段名称，默认：count
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum', //页码的参数名称，默认：page
+          limitName: 'pageSize' //每页数据量的参数名，默认：limit
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'revenueNo', title: '收款单号', width:100, },
+          {field:'customerName', title: '客户简称', width:100},
+          {field:'billNo', title: '账单号', width:100},
+          {field:'billMonth', title: '账期', width:100},
+          {field:'revenueNo', title: '收款账号', width:100},
+           {field:'price', title: '收款金额', width:100, },
+          {field:'revenueDate', title: '收款日期', width:100},
+          {field:'described', title: '摘要', width:100},
+          {field:'status', title: '状态', width:100},
+          {field:'roleUsers', title: '创建人', width:100},
+          {field:'roleUsers', title: '创建时间', width:100}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        done: function(res, curr, count){}
+      });
+    }
+
+    var active = {
+      //反核销
+      reversechargeoff: function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('请选择需反核销的数据！');
+        }else{
+          parent.layer.confirm('确定要反核销这些记录吗？',function(){
+            
+          });
+        }
+      }
+    };
+
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.close(parent.layer.index);
+    });
+  });
+  </script>
+</html>

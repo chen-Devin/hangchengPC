@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册：填写个人信息 - TMS</title>
+    <link rel="stylesheet" href="../frame/3.3.7/css/bootstrap.min.css?v=1.0">
+    <link rel="stylesheet" href="../frame/layui/css/layui.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/regist.css?v=1.0">
+</head>
+
+<body>
+    <!-- Start:头部 -->
+    <div class="panel-head">
+        <div class="panel-logo">
+            <div class="panel-left"><img src="../frame/static/images/logo.png"><span>用户注册</span></div>
+            <div class="panel-right">已有账号？<a href="/">立即登录</a></div>
+        </div>
+    </div>
+    <!-- End:头部 -->
+
+    <!-- Start:内容 -->
+    <div class="panel-main">
+        <!-- Start:步骤2-1 企业注册 -->
+        <div class="panel-register" id="register-step2-2">
+            <a href="javascript:;" class="cut_btn">切换企业用户</a>
+            <div class="steps-list">
+                <ul class="step2">
+                    <li>1、填写账户信息</li>
+                    <li>2、填写详细信息</li>
+                    <li>3、平台审核</li>
+                </ul>
+            </div>
+            <div class="register-body">
+                <div class="reg-txt">
+                    <p class="txt1">
+                        <span>温馨提示：</span><br> 1、请按照你的身份证如实填写以下内容，这是审核你开通账号的重要信息，且一经审核，将不可变更。
+                        <br> 2、有企业营业执照的企业用户请注册企业账户。
+                    </p>
+                    <p class="txt2" id="no-pass" style="display:none;">审核不通过备注：个人信息与身份证图片内容不符，请认真填写。</p>
+                </div>
+                <form method="post" autocomplete="off" id="form-regist">
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>个人信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>身份证号码</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="idCard" name="idCard" maxlength="18" placeholder="请输入身份证号码">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>姓名</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="zhName" name="zhName" maxlength="10" placeholder="请输入真实姓名">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>户口所在地</div>
+                            <div class="form-group">
+                                <input type="hidden" id="areaId" name="areaId">
+                                <div id="district">
+                                    <select class="form-select" id="province" name="province" style="margin:0;">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="city" name="city">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="county" name="county">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="street" name="street">
+                    <option value="">请选择</option>
+                  </select>
+                                </div>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>详细地址</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="address" name="address" placeholder="请输入详细地址">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>身份证正反面图片</div>
+                            <div class="form-group">
+                                <input type="hidden" id="imgUrl1" name="imgUrl1">
+                                <input type="hidden" id="imgUrl2" name="imgUrl2">
+                                <div class="layui-upload w-335" style="float:left;">
+                                    <div style="width:100%; padding:15px 0; border:#ddd 1px dotted; text-align:center;">
+                                        <table width="100%" border="0">
+                                            <tr>
+                                                <td width="50%" style="padding:0 15px;" valign="top">
+                                                    <button type="button" class="layui-btn layui-btn-normal" id="upload-btn1">上传正面</button>
+                                                    <div class="layui-upload-box" id="upload-imgs1" style="width:100%;">正面预览图</div>
+                                                </td>
+                                                <td width="50%" style="padding:0 15px;" valign="top">
+                                                    <button type="button" class="layui-btn layui-btn-normal" id="upload-btn2">上传反面</button>
+                                                    <div class="layui-upload-box" id="upload-imgs2" style="width:100%;">反面预览图</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <span class="form-error" style="line-height:normal;">格式支持JPG/PNG/GIF/BMP/JPEG，大小不超过4M</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>业务角色</div>
+                            <div class="form-group">
+                                <select class="form-select w-335" style="margin:0;" id="businessRole" name="businessRole">
+                  <option value="">请选择业务角色</option>
+                </select>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>业务经营范围</div>
+                            <div class="form-group">
+                                <input type="hidden" id="businessScope" name="businessScope">
+                                <div class="w-335 fl" id="scope-box"></div>
+                                <span class="form-error lh"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>注册人联系信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>注册人姓名</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="trueName" name="trueName" maxlength="10" placeholder="请输入注册人姓名">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title">手机号</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="mobile" name="mobile" disabled="disabled" style="background:#efefef;">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title">联系邮箱</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="email" name="email" placeholder="请输入联系邮箱">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dd>
+                            <div class="form-title">&nbsp;</div>
+                            <div class="form-group">
+                                <button type="button" class="form-submit" id="step1-btn" style="margin:0;">立即提交</button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+        <!-- End:步骤2-1 企业注册 -->
+    </div>
+    <!-- End:内容 -->
+
+    <!-- Start:底部 -->
+    <div class="panel-foot">
+        <div class="panel-bottom">
+            <p class="txt1"><a href="http://www.hcwanli.com/gongsijianjie/" target="_blank">关于我们</a>|<a href="http://www.hcwanli.com/xinpinshangxian/" target="_blank">新闻动态</a>|<a href="http://www.hcwanli.com/lianxiwomen/" target="_blank">联系我们</a>|<a href="http://www.hcwanli.com/bangzhuzhongxin/"
+                    target="_blank">帮助中心</a></p>
+            <p class="txt2">&copy; 2017 - 2020 广东航程科技有限公司. All Rights Reserved　<a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备17154150号-11</a></p>
+        </div>
+    </div>
+    <!-- End:底部 -->
+</body>
+<script type="text/javascript" src="../frame/static/js/jquery.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/layui/layui.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/comm.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/district.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/regist.js?v=1.0"></script>
+<script>
+    $(function() {
+        $(".panel-register").data("bodyType", "0"); //个体
+        $('.cut_btn').on('click', function() {
+            window.location.href = 'register2-1.html';
+        });
+
+        regisitStep2_2();
+
+        var _verificationImg = function($obj, $objVal, $txt) {
+                if ($objVal.length == 0) {
+                    checkResult($obj, $txt.errorMsg1, 2);
+                    return false;
+                } else {
+                    checkResult($obj, '', 3);
+                    return true;
+                }
+            }
+            //layui框架：日期，图片上传
+        layui.use(['upload', 'layer'], function() {
+            var $ = layui.jquery,
+                upload = layui.upload,
+                layer = layui.layer;
+
+            uploadImg('#upload-btn1', $('#upload-imgs1'), $('#imgUrl1'), '正面');
+            uploadImg('#upload-btn2', $('#upload-imgs2'), $('#imgUrl2'), '反面');
+
+            //图片上传
+            function uploadImg($o, $m, $n, $t) {
+                upload.render({
+                    elem: $o,
+                    url: '/ucenter/upload.shtml',
+                    multiple: false,
+                    exts: 'jpg|png|gif|BMP|JPEG',
+                    size: 4096,
+                    before: function(obj) {
+                        layer.load();
+                        obj.preview(function(index, file, result) {
+                            $m.html('<a href="' + result + '" target="_blank"><img src="' + result + '" alt="' + file.name + '" class="layui-upload-img"></a>');
+                        });
+                        $($o).html('重新上传' + $t);
+                    },
+                    //上传完毕
+                    done: function(res) {
+                        layer.closeAll('loading');
+                        $n.val(res.objects);
+                        _verificationImg($n, res.objects + "", $jsLang.imgUrl1);
+                        layer.msg($t + '上传成功');
+                    },
+                    //上传失败
+                    error: function(index, upload) {
+                        layer.closeAll('loading');
+                        $n.val("");
+                        _verificationImg($n, "", $jsLang.imgUrl1);
+                        layer.msg($t + '上传失败，请重新上传');
+                    }
+                });
+            }
+
+        });
+
+    });
+</script>
+
+</html>

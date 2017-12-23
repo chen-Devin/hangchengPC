@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>支付订单明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      .layui-form-item {
+        margin-bottom: 0;
+      }
+      .layui-form-label {width:120px;}
+      .layui-input-inline {padding-top: 10px;}
+      .layui-input-block span{line-height: 38px; height: 38px}
+      .green {color: green;}
+      .red {color: red;}
+      span {color: #000; font-weight: bold;}
+      .whList,.wcList {padding: 0 17px;}
+    </style>
+  </head>
+  <body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>订单信息</legend>
+    </fieldset>
+    <div class="layui-row">
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">运输作业号</label>
+          <div class="layui-input-block">
+            <span id="jobNo"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">客户</label>
+          <div class="layui-input-block">
+            <span id="targetName"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">装卸地</label>
+          <div class="layui-input-block">
+            <span id="address"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-row">
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">S/O</label>
+          <div class="layui-input-block">
+            <span id="soNo"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">司机所属公司</label>
+          <div class="layui-input-block">
+            <span id="carNoCompany"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">司机</label>
+          <div class="layui-input-block">
+            <span id="driverName"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-row">
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">拖车车牌</label>
+          <div class="layui-input-block">
+            <span id="carNo"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">箱号/箱型</label>
+          <div class="layui-input-block">
+            <span id="arkNo"></span>/
+            <span id="arkType"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">做柜日期</label>
+          <div class="layui-input-block">
+            <span id="doarkDate"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-row">
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">运费限价</label>
+          <div class="layui-input-block">
+            <span id="freightPrice"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">审核状态</label>
+          <div class="layui-input-block">
+            <span id="auditStatus"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-sm4">
+        <div class="layui-form-item">
+          <label class="layui-form-label">核销状态</label>
+          <div class="layui-input-block">
+            <span id="confirmStatus"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-row">
+      <div class="layui-col-sm12">
+        <div class="layui-form-item">
+          <label class="layui-form-label">审核备注</label>
+          <div class="layui-input-block">
+            <span id="auditRemarks"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>应付费用</legend>
+    </fieldset>
+
+    <!--start:表格列表-->
+    <div class="whList layui-row">
+      <div class="layui-col-md3 item-1">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-2">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-3">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-4">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <!--end:表格列表-->
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label" style="width: 55px;padding-left: 17px;">支付类型</label>
+        <div class="layui-input-inline">
+          <span id="copeCashFlag"></span>
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label" style="width: 56px;padding-left: 0;">应付备注</label>
+        <div class="layui-input-inline">
+          <span id="copeCostRemark"></span>
+        </div>
+      </div>
+    </div>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>车辆成本</legend>
+    </fieldset>
+
+    <!--start:表格列表-->
+    <div class="wcList layui-row">
+      <div class="layui-col-md3 item-1">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-2">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-3">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="layui-col-md3 item-4">
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>费用</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <!--end:表格列表-->
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    var $targetId = $.trim(getUrlParam("targetId")),
+        $waybillId = getUrlParam("waybillId") != "undefined" ? $.trim(getUrlParam("waybillId")) : "",
+        $jobNo = $.trim(getUrlParam("jobNo"));
+
+    //调用接口
+    $.ajax({
+      type:"GET", 
+      url:"/ucenter/general/finance/financeOrders/financeOrdersDetail.shtml?ordersType=2&status=0&targetId=" + $targetId + "&waybillId=" + $waybillId + "&jobNo=" + $jobNo,
+      dataType:"json",      
+      contentType:"application/json",
+      success:function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+           
+        if($code === 'SUCCESS'){
+          $("#jobNo").html($objects.jobNo);
+          $("#targetName").html($objects.targetName);
+          $("#doarkDate").html($objects.doarkDate);
+          $("#address").html($objects.address);
+          $("#soNo").html($objects.soNo);
+          $("#arkNo").html($objects.arkNo);
+          $("#arkType").html($objects.arkType);
+          $("#driverName").html($objects.driverName);
+          $("#carNo").html($objects.carNo);
+          $("#carNoCompany").html($objects.carNoCompany);
+          $("#freightPrice").html($objects.freightPrice);
+          $("#auditStatus").html($objects.auditStatus == 0 ? "未审核" : "已审核");
+          if($objects.confirmStatus == 0){
+            $("#confirmStatus").html("未核销");
+          }else if($objects.confirmStatus == 1){
+            $("#confirmStatus").html("部分核销");
+          }else{
+            $("#confirmStatus").html("全部核销");
+          }
+          $("#auditRemarks").html($objects.auditRemarks);
+          $("#copeCashFlag").html($objects.copeCashFlag == 0 ? "非现金" : "现金结算");
+          $("#copeCostRemark").html($objects.copeCostRemark);
+
+          var className;
+          for(var i = 0; i < $objects.whList.length; i++){
+            if($objects.whList[i].hacostAmount > 0){
+              className = "green";
+            }else if($objects.whList[i].hacostAmount < 0){
+              className = "red";
+            }
+            if(i % 4 == 0){
+              $(".whList .item-1 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.whList[i].hacostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.whList[i].hacostAmount == null ? 0 : $objects.whList[i].hacostAmount) + "</td></tr>");
+            }else if(i % 4 == 1){
+              $(".whList .item-2 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.whList[i].hacostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.whList[i].hacostAmount == null ? 0 : $objects.whList[i].hacostAmount) + "</td></tr>");
+            }else if(i % 4 == 2){
+              $(".whList .item-3 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.whList[i].hacostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.whList[i].hacostAmount == null ? 0 : $objects.whList[i].hacostAmount) + "</td></tr>");
+            }else if(i % 4 == 3){
+              $(".whList .item-4 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.whList[i].hacostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.whList[i].hacostAmount == null ? 0 : $objects.whList[i].hacostAmount) + "</td></tr>");
+            }
+            className = "";
+          }
+
+          for(var i = 0; i < $objects.wcList.length; i++){
+            if($objects.wcList[i].carcostAmount > 0){
+              className = "green";
+            }else if($objects.wcList[i].carcostAmount < 0){
+              className = "red";
+            }
+            if(i % 4 == 0){
+              $(".wcList .item-1 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wcList[i].carcostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wcList[i].carcostAmount == null ? 0 : $objects.wcList[i].carcostAmount) + "</td></tr>");
+            }else if(i % 4 == 1){
+              $(".wcList .item-2 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wcList[i].carcostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wcList[i].carcostAmount == null ? 0 : $objects.wcList[i].carcostAmount) + "</td></tr>");
+            }else if(i % 4 == 2){
+              $(".wcList .item-3 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wcList[i].carcostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wcList[i].carcostAmount == null ? 0 : $objects.wcList[i].carcostAmount) + "</td></tr>");
+            }else if(i % 4 == 3){
+              $(".wcList .item-4 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wcList[i].carcostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wcList[i].carcostAmount == null ? 0 : $objects.wcList[i].carcostAmount) + "</td></tr>");
+            }
+            className = "";
+          }
+
+          if(($objects.whList.length - 1) % 4 == 0){
+            $(".whList .item-2 tbody").append("<tr><td>" + ($objects.whList.length + 1) + "</td><td></td><td></td></tr>");
+            $(".whList .item-3 tbody").append("<tr><td>" + ($objects.whList.length + 2) + "</td><td></td><td></td></tr>");
+            $(".whList .item-4 tbody").append("<tr><td>" + ($objects.whList.length + 3) + "</td><td></td><td></td></tr>");
+          }else if(($objects.whList.length - 1) % 4 == 1){
+            $(".whList .item-3 tbody").append("<tr><td>" + ($objects.whList.length + 1) + "</td><td></td><td></td></tr>");
+            $(".whList .item-4 tbody").append("<tr><td>" + ($objects.whList.length + 2) + "</td><td></td><td></td></tr>");
+          }else if(($objects.whList.length - 1) % 4 == 2){
+            $(".whList .item-4 tbody").append("<tr><td>" + ($objects.whList.length + 1) + "</td><td></td><td></td></tr>");
+          }
+
+          if(($objects.wcList.length - 1) % 4 == 0){
+            $(".wcList .item-2 tbody").append("<tr><td>" + ($objects.wcList.length + 1) + "</td><td></td><td></td></tr>");
+            $(".wcList .item-3 tbody").append("<tr><td>" + ($objects.wcList.length + 2) + "</td><td></td><td></td></tr>");
+            $(".wcList .item-4 tbody").append("<tr><td>" + ($objects.wcList.length + 3) + "</td><td></td><td></td></tr>");
+          }else if(($objects.wcList.length - 1) % 4 == 1){
+            $(".wcList .item-3 tbody").append("<tr><td>" + ($objects.wcList.length + 1) + "</td><td></td><td></td></tr>");
+            $(".wcList .item-4 tbody").append("<tr><td>" + ($objects.wcList.length + 2) + "</td><td></td><td></td></tr>");
+          }else if(($objects.wcList.length - 1) % 4 == 2){
+            $(".wcList .item-4 tbody").append("<tr><td>" + ($objects.wcList.length + 1) + "</td><td></td><td></td></tr>");
+          }
+        }
+      }
+    });
+  });
+  </script>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>费用明细 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      .layui-input-inline {padding-top: 10px;}
+      .green {color:green;}
+      .red {color:red;}
+      span {color: #000; font-weight: bold;}
+      .wrList {padding: 0 17px;}
+      hr {margin: 0 10px; background: #b5b4b4;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <!--start:表格列表-->
+      <div class="wrList layui-row">
+        <div class="layui-col-md3 item-1">
+          <table class="layui-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="layui-col-md3 item-2">
+          <table class="layui-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="layui-col-md3 item-3">
+          <table class="layui-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="layui-col-md3 item-4">
+          <table class="layui-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>费用</th>
+                <th>金额</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <!--end:表格列表-->
+
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label" style="width: 55px;padding-left: 17px;">支付类型</label>
+          <div class="layui-input-inline">
+            <span id="receivableCashFlag"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label" style="width: 56px;padding-left: 0;">应收备注</label>
+          <div class="layui-input-inline">
+            <span id="receivableCostRemark"></span>
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label" style="width:55px;padding-left: 17px;">审核备注</label>
+          <div class="layui-input-inline" style="width:1038px;">
+            <textarea id="auditRemarks" name="auditRemarks" lay-verify="auditRemarks" maxlength="1000" placeholder="" class="layui-textarea"></textarea>
+          </div>          
+        </div>
+      </div>
+      <br>
+      <div class="layui-form-item" style="text-align:center;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">审核</button>
+        <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">取消</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    //自定义验证规则
+    form.verify({
+      auditRemarks: function(value){
+        if(value.length == 0){
+          return '请输入审核备注';
+        }
+      }
+    });
+
+    var $targetId = $.trim(getUrlParam("targetId")),
+        $waybillId = getUrlParam("waybillId") != "undefined" ? $.trim(getUrlParam("waybillId")) : "",
+        $jobNo = $.trim(getUrlParam("jobNo"));
+
+    //调用接口
+    $.ajax({
+      type:"GET", 
+      url:"/ucenter/general/finance/financeOrders/financeOrdersDetail.shtml?ordersType=1&status=0&targetId=" + $targetId + "&waybillId=" + $waybillId + "&jobNo=" + $jobNo,
+      dataType:"json",      
+      contentType:"application/json",
+      success:function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+           
+        if($code === 'SUCCESS'){
+          $("#receivableCashFlag").html($objects.receivableCashFlag == 0 ? "非现金" : "现金结算");
+          $("#receivableCostRemark").html($objects.receivableCostRemark);
+
+          var className;
+          for(var i = 0; i < $objects.wrList.length; i++){
+            if($objects.wrList[i].recostAmount > 0){
+              className = "green";
+            }else if($objects.wrList[i].recostAmount < 0){
+              className = "red";
+            }
+            if(i % 4 == 0){
+              $(".wrList .item-1 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wrList[i].recostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wrList[i].recostAmount == null ? 0 : $objects.wrList[i].recostAmount) + "</td></tr>");
+            }else if(i % 4 == 1){
+              $(".wrList .item-2 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wrList[i].recostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wrList[i].recostAmount == null ? 0 : $objects.wrList[i].recostAmount) + "</td></tr>");
+            }else if(i % 4 == 2){
+              $(".wrList .item-3 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wrList[i].recostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wrList[i].recostAmount == null ? 0 : $objects.wrList[i].recostAmount) + "</td></tr>");
+            }else if(i % 4 == 3){
+              $(".wrList .item-4 tbody").append("<tr><td>" + (i + 1) + "</td><td>" + $objects.wrList[i].recostName + "</td><td" + (className != "" ? " class='" + className + "'" : "") + ">" + ($objects.wrList[i].recostAmount == null ? 0 : $objects.wrList[i].recostAmount) + "</td></tr>");
+            }
+            className = "";
+          }
+
+          if(($objects.wrList.length - 1) % 4 == 0){
+            $(".wrList .item-2 tbody").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
+            $(".wrList .item-3 tbody").append("<tr><td>" + (i + 2) + "</td><td></td><td></td></tr>");
+            $(".wrList .item-4 tbody").append("<tr><td>" + (i + 3) + "</td><td></td><td></td></tr>");
+          }else if(($objects.wrList.length - 1) % 4 == 1){
+            $(".wrList .item-3 tbody").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
+            $(".wrList .item-4 tbody").append("<tr><td>" + (i + 2) + "</td><td></td><td></td></tr>");
+          }else if(($objects.wrList.length - 1) % 4 == 2){
+            $(".wrList .item-4 tbody").append("<tr><td>" + (i + 1) + "</td><td></td><td></td></tr>");
+          }
+        }
+      }
+    });
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      var $auditRemarks = $.trim(data.field.auditRemarks);
+      // var $lastChars = $auditRemarks.substr($auditRemarks.length - 1,1);
+      // if($lastChars != "。"){
+      //   $auditRemarks = $auditRemarks + "。";
+      // }
+
+      //数据源
+      var $saveData = {
+        status: 0,
+        ordersType: 1,
+        waybillId: $waybillId,
+        auditRemarks: $auditRemarks
+      }
+      
+      //调用接口
+      $.ajax({
+        type:"PUT", 
+        url:"/ucenter/general/finance/financeOrders/financeOrdersAudit.shtml", 
+        dataType:"json",      
+        contentType:"application/json",               
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+             
+          if($code === 'SUCCESS'){
+            parent.layer.alert("审核成功", {
+              closeBtn: 0,
+              yes: function(index){
+                parent.layer.closeAll();
+                var layId = $(window.parent.document).find("li.layui-this").attr("lay-id");
+                $(window.parent["f" + layId].document).find('.btn-search').click();
+              }
+            });
+          }else{
+            parent.layer.alert('保存信息失败，请重新填写！');
+            return false;
+          }
+        }
+      });
+      return false;
+    });
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.close(parent.layer.index);
+    });
+  });
+  </script>
+</html>

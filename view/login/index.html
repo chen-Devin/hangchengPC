@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 - TMS</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="/view/frame/3.3.7/css/bootstrap.min.css?v=1.0">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/frame/static/css/login.css?v=1.0">
+    <!--[if lt IE 9]>
+      <script src="/view/frame/static/js/html5shiv.min.js"></script>
+      <script src="/view/frame/static/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="panel-login">
+        <div class="login-title"><span><img src="/view/frame/static/images/logo4.png"></span></div>
+        <div class="login-body">
+            <div class="body-title">账号登录</div>
+            <form method="post" autocomplete="off" id="form-login">
+                <div class="form-group">
+                    <input type="text" class="form-input username" id="username" name="username" maxlength="20" placeholder="手机号/用户名">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input password" id="password" name="password" maxlength="20" placeholder="登录密码">
+                </div>
+                <!-- <div class="form-group" id="vcode-box" style="display:block;"> -->
+                <div class="form-group" id="vcode-box">
+                    <input type="vcode" class="form-input vcode" id="vcode" name="vcode" maxlength="4" placeholder="验证码">
+                    <div class="vcode-img"><img src="/valicode.shtml?v=1.0" id="vcodeImg"></div>
+                    <div class="vcode-txt"><a id="checkVcode">换一张</a></div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="check-box">
+                    <label>
+              <input type="checkbox" name="remember" id="remember" value="1"> 记住账号
+            </label>
+                    <!--<a href="getPassword.html" class="find-password">找回密码？</a>-->
+                </div>
+                <div class="error-msg"></div>
+                <button type="button" class="form-submit">登录</button>
+                <div class="register">还没有账号？<a href="/view/regist/index.html">去注册</a></div>
+            </form>
+        </div>
+        <div class="login-mask"></div>
+    </div>
+    <div class="footer">
+        <div class="footer-body">
+            <div class="body-content">
+                <div class="lefter">
+                    <p class="txt1">热线电话： 0755-82789239<span>9:00-20:00，周一至周五</span></p>
+                    <p class="txt2"><a href="http://www.hcwanli.com/gongsijianjie/" target="_blank">关于我们</a><a href="http://www.hcwanli.com/xinpinshangxian/" target="_blank">新闻动态</a><a href="http://www.hcwanli.com/lianxiwomen/" target="_blank">联系我们</a><a href="http://www.hcwanli.com/bangzhuzhongxin/"
+                            target="_blank">帮助中心</a></p>
+                    <p class="txt3">&copy; 2017 - 2020 广东航程科技有限公司. All Rights Reserved　<a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备17154150号-11</a></p>
+                </div>
+                <div class="righter">
+                    <ul>
+                        <li><img src="/view/frame/static/images/qr_code.gif"><span>微信公众号</span></li>
+                        <li><img src="/view/frame/static/images/qr_code.gif"><span>APP下载</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-mask"></div>
+    </div>
+</body>
+<script type="text/javascript" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script type="text/javascript" src="/view/frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="/view/frame/static/js/HC.js"></script>
+<script type="text/javascript" src="/view/frame/static/js/login.js?v=1.0"></script>
+<script>
+    $(function() {
+            autoMargin();
+        })
+        //窗口调整事件
+    $(window).resize(function() {
+        autoMargin();
+    });
+
+    //自适应间距
+    function autoMargin() {
+        var winHeight = $(window).height();
+        var marginTop = (winHeight - $('.panel-login').height() - $('.footer').height()) / 2;
+        if (marginTop <= 20) {
+            marginTop = 20;
+        }
+        $('.panel-login').css({
+            'margin': marginTop + 'px auto'
+        });
+    }
+</script>
+
+</html>

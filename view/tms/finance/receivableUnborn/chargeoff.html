@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>核销费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:150px;}
+      .layui-form-item {
+          margin-bottom: 0;
+      }
+      .layui-form-item .layui-input-inline {width:240px;}
+      .layui-input-inline span {color: #000; font-weight: bold; display: inline-block; margin-top: 10px;}
+       .layui-form-item-control {margin-bottom: 15px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">运输作业号</label>
+          <div class="layui-input-inline">
+            <span id="jobNo"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">S/O</label>
+          <div class="layui-input-inline">
+            <span id="soNumber"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">运费（元）</label>
+          <div class="layui-input-inline">
+            <span id="transportCost"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">异常费（元）</label>
+          <div class="layui-input-inline">
+            <span id="extraCost"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">合计（元）</label>
+          <div class="layui-input-inline">
+            <span id="totalCost"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">已收金额（元）</label>
+          <div class="layui-input-inline">
+            <span id="paidCost"></span>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item layui-form-item-control">
+        <div class="layui-inline">
+          <label class="layui-form-label">未收金额（元）</label>
+          <div class="layui-input-inline">
+            <span id="notReceivedCost"></span>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>收款账户</label>
+          <div class="layui-input-inline">
+            <select name="channel" lay-verify="channel">
+              <option value="">请选择</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item layui-form-item-control">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>收款金额（元）</label>
+          <div class="layui-input-inline">
+            <input type="text" name="receivePay" id="receivePay" lay-verify="receivePay" placeholder="" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>收款日期</label>
+          <div class="layui-input-inline">
+            <input type="text" name="receiveTime" id="receiveTime" lay-verify="receiveTime" placeholder="" class="layui-input">
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item layui-form-item-control">
+        <div class="layui-inline">
+          <label class="layui-form-label">摘要</label>
+          <div class="layui-input-inline" style="width:684px;">
+            <textarea id="described" name="described" maxlength="1000" placeholder="" class="layui-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="layui-form-item" style="text-align:center; margin-top:20px;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" style="width:150px;">保存</button>
+        <button class="layui-btn layui-btn-primary btn-cancel" type="button" style="width:150px;">取消</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#receiveTime' //收款日期
+    });
+
+    //自定义验证规则
+    form.verify({
+      channel: function(value){
+        if(value.length == 0){
+          return '请选择收款账户';
+        }
+      },
+      receivePay: function(value){
+        if(value.length == 0){
+          return '请输入收款金额';
+        }else if(!$jsReg.plus.test(value)){
+          return '收款金额只能输入正数(小数点后两位)';
+        }
+      },
+      receiveTime: function(value){
+        if(value.length == 0){
+          return '请选择收款日期';
+        }
+      }
+    });
+
+    //焦点事件
+    $('#receivePay').focus(function(){
+      // layer.tips('200位字符', '#receivePay', {
+      //   tips: [3, '#78BA32']
+      // });
+    });
+    $('#receivePay').blur(function(){
+      if($(this).val().length == 0){
+        layer.tips('请输入收款金额', '#receivePay', {
+          tips: [3, '#d84747']
+        });
+      }else if($(this).val().length > 0){
+        if(!$jsReg.plus.test($(this).val())){
+          layer.tips('收款金额只能输入正数(小数点后两位)', '#receivePay', {
+            tips: [3, '#d84747']
+          });
+        }
+      }
+    });
+
+    var $ordersId = $.trim(getUrlParam("ordersId")),$modifyDate;
+
+    //调用接口
+    $.ajax({
+      type:"GET", 
+      url:"/ucenter/general/finance/financeOrders/financeOrdersverificationInfo.shtml?ordersId=" + $ordersId,
+      dataType:"json",      
+      contentType:"application/json",
+      success:function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+           
+        if($code === 'SUCCESS'){
+          $("#jobNo").html($objects.jobNo);
+          $("#soNumber").html($objects.soNumber);
+          $("#transportCost").html($objects.transportCost);
+          $("#extraCost").html($objects.extraCost);
+          $("#totalCost").html($objects.totalCost);
+          $("#paidCost").html($objects.paidCost);
+          $("#notReceivedCost").html($objects.notReceivedCost);
+          $modifyDate = $objects.modifyDate;
+        }
+      }
+    });
+
+    //加载收款账户下拉框数据
+      $.get('/ucenter/general/finance/settlementChannel/searchBankNameAccountNo.shtml', function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+
+        if($code != 'SUCCESS') return false;
+        
+        if($objects.length > 0){
+          for(var $i = 0; $i < $objects.length; $i++){
+            if($objects[$i].accountName != null && $objects[$i].accountNo != null && $objects[$i].status == 1){
+              $('select[name="channel"]').append('<option value="'+ $objects[$i].id +'">'+ $objects[$i].accountNo + '(' + $objects[$i].accountName +')</option>');
+            }
+          }
+          form.render('select');
+        }
+      }, 'json');
+
+    //监听提交
+    form.on('submit(submit)', function(data){
+      //数据源
+      var $saveData = {
+        pkId: $ordersId,
+        channel: $.trim(data.field.channel),
+        receivePay: $.trim(data.field.receivePay),
+        described: $.trim(data.field.described),
+        receiveTime: $.trim(data.field.receiveTime),
+        lastModifyTime: $modifyDate
+      }
+      
+      //调用接口
+      $.ajax({
+        type:"POST", 
+        url:"/ucenter/general/finance/confirm/ordersConfirm.shtml", 
+        dataType:"json",      
+        contentType:"application/json",               
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+             
+          if($code === 'SUCCESS'){
+            parent.layer.alert("保存成功", {
+              closeBtn: 0,
+              yes: function(index){
+                parent.layer.closeAll();
+                var layId = $(window.parent.document).find("li.layui-this").attr("lay-id");
+                $(window.parent["f" + layId].document).find('.btn-search').click();
+              }
+            });
+          }else{
+            parent.layer.alert('保存信息失败，请重新填写！');
+            return false;
+          }
+        }
+      });
+      return false;
+    });
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.close(parent.layer.index);
+    });
+  });
+  </script>
+</html>

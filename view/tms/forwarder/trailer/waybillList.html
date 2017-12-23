@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>运单费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+      .layui-form-item {margin:0;}
+      .layui-form-item .layui-inline {margin-bottom:0; margin-right:6px;}
+      .layui-form-item .layui-inline .layui-input-inline {margin-right:4px; width:160px;}
+      .layui-form-item .layui-inline .layui-form-mid {margin-right:4px;}
+      .fold {font-size:23px; font-style:normal; font-weight:bold; cursor:pointer;}
+      .sub-table .layui-table-view {margin:3px; margin-left:-1px;}
+      .sub-tool-bar {margin:0 30px 5px 0; text-align:left; line-height:30px;}
+      .sub-tool-bar a {margin:0 10px; color:#055bae; text-decoration:underline;}
+      .time-btn-sel {background:#cecece; color:#000;}
+      searchMore {display:none;}
+    </style>
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane" autocomplete="off">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label" style="width:90px;">客户</label>
+            <div class="layui-input-inline">
+              <input type="text" name="customerName" placeholder="客户名称" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label" style="width:90px;">做柜时间</label>
+            <div class="layui-input-inline">
+              <input type="text" name="doarkDateStart" id="doarkDateStart" readonly placeholder="起始时间" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline">
+              <input type="text" name="doarkDateEnd" id="doarkDateEnd" readonly placeholder="截止时间" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+              <select name="status">
+                <option value="0">未审核</option>
+                <option value="1">已审核</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+          </div>
+        </div>
+        <div class="layui-form-item" style="margin-top:10px;">
+          <div class="layui-inline">
+            <label class="layui-form-label" style="width:90px;">S/O No.</label>
+            <div class="layui-input-inline">
+              <input type="text" name="soNumber" placeholder="S/O号码" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label" style="width:90px;">柜号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="arkNo" placeholder="柜号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label" style="width:90px;">订单号</label>
+            <div class="layui-input-inline">
+              <input type="text" name="orderNo" placeholder="订单号" class="layui-input">
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="clr"></div>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn layui-btn-normal" data-type="receipt">回单</button>
+        <button class="layui-btn layui-btn-normal" data-type="approve">审核通过</button>
+        <button class="layui-btn layui-btn-normal" data-type="adjustFee">调整费用</button>
+        <button class="layui-btn layui-btn-normal" data-type="payment">申请付款</button>
+      </div>
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <script type="text/html" id="statusTpl">
+      {{setCostStatus(d.receivableCostStatus)}}
+    </script>
+    <script type="text/html" id="doarkDateTpl">
+      {{new Date(d.doarkDate).format('MM-dd hh:mm')}}
+    </script>
+    <script type="text/html" id="addressTpl">
+      {{# if(d.address != null){ }}
+      {{# var $newArr = d.address.split(';') }}
+      {{# if($newArr.length > 0){ }}
+        {{# $newArr = deWeightArr($newArr) }}
+        {{$newArr.join(' || ')}}
+      {{# } }}
+      {{# } }}
+    </script>
+    <script type="text/html" id="hasReceiveCashTpl">
+      {{# if(d.hasReceiveCash == 1){ }}
+        <input type="checkbox" name="hasReceiveCash" lay-skin="primary" value="true" checked disabled>
+      {{# }else{ }}
+        <input type="checkbox" name="hasReceiveCash" lay-skin="primary" value="false" disabled>
+      {{# } }}
+    </script>
+    <script type="text/html" id="hasHandleCashTpl">
+      {{# if(d.hasHandleCash == 1){ }}
+        <input type="checkbox" name="hasHandleCash" lay-skin="primary" value="true" checked disabled>
+      {{# }else{ }}
+        <input type="checkbox" name="hasHandleCash" lay-skin="primary" value="false" disabled>
+      {{# } }}
+    </script>
+    <script type="text/html" id="receiveFreightTpl">
+      {{# if(d.receiveFreight != null){ }}
+        {{d.receiveFreight}}
+      {{# }else{ }}0{{# } }}
+    </script>
+    <script type="text/html" id="handleFreightTpl">
+      {{# if(d.handleFreight != null){ }}
+        {{d.handleFreight}}
+      {{# }else{ }}0{{# } }}
+    </script>
+    <script type="text/html" id="receiveExCostTpl">
+      {{# if(d.receiveExCost != null){ }}
+        <span style="color:#f00;">{{d.receiveExCost}}</span>
+      {{# }else{ }}0{{# } }}
+    </script>
+    <script type="text/html" id="handleExCost1Tpl">
+      {{# if(d.handleExCost1 != null){ }}
+        <span style="color:#f00;">{{d.handleExCost1 + d.handleExCost2}}</span>
+      {{# }else{ }}0{{# } }}
+    </script>
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    //初始化日期时间
+    laydate.render({
+      elem: '#doarkDateStart'
+    });
+    laydate.render({
+      elem: '#doarkDateEnd'
+    });
+
+    //初始化表格数据
+    setTableData({});
+
+    //监听提交
+    form.on('submit(search)', function(data){
+      var v1 = data.field.doarkDateStart, v2 = data.field.doarkDateEnd;
+      if(v1.length > 0 && v2.length == 0){
+        layer.msg('请选择截止时间');
+        return false;
+      }
+      if(v1.length == 0 && v2.length > 0){
+        layer.msg('请选择起始时间');
+        return false;
+      }
+      if(v1.length > 0 && v2.length > 0){
+        v1 = new Date(v1);
+        v2 = new Date(v2);
+        if(v1 > v2){
+          layer.msg('截止时间要大于起始时间');
+          return false;
+        }
+      }
+
+      var $saveData = data.field;
+      setTableData($saveData);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($searchData){
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/tms/waybill/waybill/searchCheckFreight.shtml',
+        method: 'post',
+        where: $searchData,
+        response: {
+          statusCode: 'SUCCESS',
+          dataName: 'objects'
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'id', title: '序号', width:80, sort: true, align: 'center'},
+          {field:'receivableCostStatus', title: '应收状态', width:90, sort: true, align: 'center', templet: '#statusTpl'},
+          {field:'customerName', title: '客户', width:80, align: 'center'},
+          {field:'orderNo', title: '订单号码', width:140, align: 'center'},
+          {field:'soNumber', title: 'S/O', width:125, align: 'center'},
+          {field:'arkNo', title: '柜号', width:120, align: 'center'},
+          {field:'doarkDate', title: '做柜时间', width:100, sort: true, align: 'center', templet: '#doarkDateTpl'},
+          {field:'arkType', title: '箱型', width:60, align: 'center'},
+          {field:'carNo', title: '车牌', width:90, align: 'center'},
+          {field:'receiveFreight', title: '应收费用', width:90, align: 'center', templet: '#receiveFreightTpl'},
+          {field:'receiveExCost', title: '应收异常费用', width:105, align: 'center', templet: '#receiveExCostTpl'},
+          {field:'hasReceiveCash', title: '现金结算', width:80, align: 'center', templet: '#hasReceiveCashTpl'},
+          {field:'handleFreight', title: '应付费用', width:90, align: 'center', templet: '#handleFreightTpl'},
+          {field:'handleExCost1', title: '应付异常费用', width:105, align: 'center', templet: '#handleExCost1Tpl'},
+          {field:'hasHandleCash', title: '现金结算', width:80, align: 'center', templet: '#hasHandleCashTpl'},
+          {field:'confirmMan', title: '确认人', width:80, align: 'center'},
+          {field:'address', title: '装卸地点', width:100, align: 'center', templet: '#addressTpl'}
+        ]],
+        id: 'dataReload',
+        page: false,
+        height: 'full-178',
+        size: 'sm',
+        even: true
+      });
+
+      //添加快捷搜索
+      var $shortBarHtml = $('#shortBar').html();
+      $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+    }
+
+    var active = {
+      //回单
+      receipt: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          if(data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+          parent.layer.open({
+            type: 2,
+            title: '调度回单（' + data[0].id + '）',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['80%', '80%'],
+            content: 'receipt.html?id=' + data[0].id
+          });
+        }
+      },
+      //审核通过
+      approve: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+            
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else{
+          if(data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+
+          var $waybillIds = [],
+              $isPass = [],
+              $receivableCostCount = 0,
+              $copeCostCount = 0;
+          for(var $i = 0; $i < data.length; $i++){
+            if(data[$i].receivableCostStatus == 1){
+              $waybillIds.push(data[$i].id);
+              $receivableCostCount += data[$i].receiveFreight != null ? data[$i].receiveFreight : 0;
+              $copeCostCount += data[$i].handleFreight != null ? data[$i].handleFreight : 0;
+            }else{
+              $isPass.push(1);
+            }
+          }
+
+          if($waybillIds.length == 0){
+            parent.layer.msg('没有可以通过审核的运单！');
+            return false;
+          }
+          if($isPass.length > 0){
+            parent.layer.msg('只有待复核的运单才能通过审核！');
+            setTimeout(function(){
+              approveData($waybillIds, $receivableCostCount, $copeCostCount);
+            }, 3000);
+          }else{
+            approveData($waybillIds, $receivableCostCount, $copeCostCount);
+          }
+
+          //审核通过接口
+          function approveData(ids, r, c){
+            parent.layer.confirm('确定要审核通过吗？', function(index){
+              var $saveData = {
+                waybillIds: ids,
+                receivableCostCount: r,
+                copeCostCount: c
+              };
+              $.ajax({
+                type:'POST', 
+                url:'/ucenter/tms/waybill/waybill/updateCheckFreight.shtml', 
+                dataType:"json",      
+                contentType:"application/json",               
+                data:JSON.stringify($saveData), 
+                success:function(d){
+                  var $code = d.code,
+                      $msg = d.msg,
+                      $objects = d.objects;
+                      
+                  if($code === 'SUCCESS'){
+                    window.location.reload();
+                  }else{
+                    parent.layer.msg('操作失败！');
+                  }
+                }
+              });
+              parent.layer.close(index);
+              return false;
+            });
+          }
+        }
+      },
+      //调整费用
+      adjustFee: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          if(data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+          if(data[0].receivableCostStatus != 0){
+            parent.layer.msg('只有录入状态的运单才能调整费用！');
+            return false;
+          }
+
+          parent.layer.open({
+            type: 2,
+            title: '调整费用（' + data[0].id + '）',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['80%', '80%'],
+            content: 'adjustFee.html?id=' + data[0].id
+          });
+        }
+      },
+      //申请付款
+      payment: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else{
+          if(data[0].receivableCostStatus == 7 || data[0].receivableCostStatus == 8) return false;
+          
+          var $waybillIds = [],
+              $arkList = [],
+              $isPay = [],
+              $handleFreight = 0,
+              $f1 = 0, $f2 = 0, $f3 = 0;
+          for(var $i = 0; $i < data.length; $i++){
+            if(data[$i].receivableCostStatus  == 4){
+              var $item = {};
+              $item.waybillId = data[$i].id;
+              $waybillIds.push(data[$i].id);
+              $f1 = data[$i].handleFreight != null ? data[$i].handleFreight : 0;
+              $f2 = data[$i].handleExCost1 != null ? data[$i].handleExCost1 : 0;
+              $f3 = data[$i].handleExCost2 != null ? data[$i].handleExCost2 : 0;
+              $handleFreight = $f1 + $f2 + $f3;
+              $item.askCost = $handleFreight;
+              $arkList.push($item);
+            }else{
+              $isPay.push(1);
+            }
+          }
+
+          if($waybillIds.length == 0){
+            parent.layer.msg('没有可以申请付款的运单！');
+            return false;
+          }
+          if($isPay.length > 0){
+            parent.layer.msg('只有生成账单的运单才能付款！');
+            setTimeout(function(){
+              paymentData($arkList);
+            }, 3000);
+          }else{
+            paymentData($arkList);
+          }
+
+          //审核通过接口
+          function paymentData(arrs){
+            parent.layer.confirm('确定要申请付款吗？', function(index){
+              var $saveData = {
+                askList: arrs
+              };
+              $.ajax({
+                type:'POST', 
+                url:'/ucenter/tms/waybill/waybill/forPay.shtml', 
+                dataType:"json",      
+                contentType:"application/json",               
+                data:JSON.stringify($saveData), 
+                success:function(d){
+                  var $code = d.code,
+                      $msg = d.msg,
+                      $objects = d.objects;
+                      
+                  if($code === 'SUCCESS'){
+                    window.location.reload();
+                  }else{
+                    parent.layer.msg('操作失败！');
+                  }
+                }
+              });
+              parent.layer.close(index);
+              return false;
+            });
+          }
+        }
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+</html>

@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/iframe.css?v=1.0">
+    <style>
+      .layui-form-item {margin:0;}
+      .layui-form-item .layui-inline {margin-bottom:0; margin-right:6px;}
+      .layui-form-item .layui-inline .layui-input-inline {margin-right:4px; width:160px;}
+      .layui-form-item .layui-inline .layui-form-mid {margin-right:4px;}
+      .fold {font-size:23px; font-style:normal; font-weight:bold; cursor:pointer;}
+      .sub-table .layui-table-view {margin:3px; margin-left:-1px;}
+      .sub-tool-bar {margin:10px 0 12px; text-align:left;}
+      searchMore {display:none;}
+    </style>
+  </head>
+  <body>
+    <!--start: 搜索-->
+    <div class="panel-handle search-bar">
+      <form class="layui-form layui-form-pane" autocomplete="off">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <div class="layui-input-inline" style="width:100px;">
+              <select name="onlyOrder">
+                <option value="false">S/O No.</option>
+                <option value="true">JOB No.</option>
+              </select>
+            </div>
+            <div class="layui-input-inline">
+              <input type="text" name="orderNo" placeholder="编号" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline" style="margin-right:0;">
+            <div class="layui-input-inline" style="width:100px; margin-right:0;">
+              <select name="onlyDoArkTime">
+                <option value="true">做柜时间</option>
+                <option value="false">截关时间</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-inline">
+            <div class="layui-input-inline">
+              <input type="text" name="doArkTimeStart" id="doArkTimeStart" placeholder="起始时间" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline">
+              <input type="text" name="doArkTimeEnd" id="doArkTimeEnd" placeholder="截止时间" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+              <select name="status">
+                <option value="100">录入</option>
+                <option value="200">已委托</option>
+                <option value="300">已接单</option>
+                <option value="400">作业中</option>
+                <option value="500">作业完成</option>
+                <option value="600">订单完成</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layui-btn-danger" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>查询</button>
+            <button class="layui-btn layui-btn-primary search-more" type="button" style="margin:0;">高级查询<i class="layui-icon">&#xe625;</i></button>
+            <button class="layui-btn layui-btn-primary" type="reset" style="margin:0;">重置</button>
+          </div>
+        </div>
+        <searchMore>
+          <div class="layui-form-item" style="margin-top:10px;">
+            <div class="layui-inline">
+              <label class="layui-form-label" style="width:103px;">运输企业</label>
+              <div class="layui-input-inline">
+                <input type="text" name="carrier" placeholder="运输企业" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label" style="width:103px;">急单类型</label>
+              <div class="layui-input-inline">
+                <select name="singleType">
+                  <option value="1">正常单</option>
+                  <option value="2">赶船</option>
+                  <option value="3">赶补料</option>
+                  <option value="4">赶截关</option>
+                </select>
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label" style="width:103px;">报关方式</label>
+              <div class="layui-input-inline">
+                <select name="brokenStyle">
+                  <option value="1">出口清关</option>
+                  <option value="2">出口转关</option>
+                  <option value="3">进口清关</option>
+                  <option value="4">进口转关</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="layui-form-item" style="margin-top:10px;">
+            <div class="layui-inline">
+              <label class="layui-form-label" style="width:103px;">货物类型</label>
+              <div class="layui-input-inline">
+                <select name="goodsType">
+                  <option value="1">普货</option>
+                  <option value="2">危品</option>
+                </select>
+              </div>
+            </div>
+            <div class="layui-inline">
+              <label class="layui-form-label" style="width:103px;">委托服务</label>
+              <div class="layui-input-inline">
+                <select name="entrustService">
+                  <option value="1">运输</option>
+                  <option value="2">关务</option>
+                  <option value="3">运输,关务</option>
+                  <option value="4">船务</option>
+                  <option value="5">运输,代送资料</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </searchMore>
+      </form>
+      <div class="clr"></div>
+    </div>
+    <!--end: 搜索-->
+    
+    <!--start: 按钮组-->
+    <div class="panel-handle btns-bar">
+      <div class="layui-btn-group fl">
+        <button class="layui-btn" data-type="allData">全部</button>
+        <button class="layui-btn layui-btn-normal" data-type="addData">新增</button>
+        <button class="layui-btn layui-btn-normal" data-type="editData">编辑</button>
+        <button class="layui-btn layui-btn-normal" data-type="delData">删除</button>
+        <button class="layui-btn layui-btn-normal" data-type="uploadAttachment">上传附件</button>
+        <button class="layui-btn layui-btn-normal" data-type="copy">复制</button>
+      </div>
+      <!-- <div class="layui-btn-group fr">
+        <button class="layui-btn"><i class="layui-icon" style="font-size:14px;">&#xe62f;</i>导入</button>
+        <button class="layui-btn"><i class="layui-icon">&#xe62d;</i>导出EXCEL</button>
+      </div> -->
+      <div class="clr"></div>
+    </div>
+    <!--end: 按钮组-->
+
+    <!--start:表格列表-->
+    <table class="layui-hide" id="tableList" lay-filter="tbar"></table>
+    <!--end:表格列表-->
+
+    <!--start:快捷搜索-->
+    <div id="shortBar" style="display:none;">
+      <dl>
+        <dt>统计信息</dt>
+        <dd><a href="">录入<span class="layui-badge">50</span></a></dd>
+        <dd><a href="">委托<span class="layui-badge">43</span></a></dd>
+        <dd><a href="">接单<span class="layui-badge">18</span></a></dd>
+        <dd><a href="">作业中<span class="layui-badge">18</span></a></dd>
+        <dd><a href="">已核算费用<span class="layui-badge">18</span></a></dd>
+        <dd><a href="">已确认费用<span class="layui-badge">18</span></a></dd>
+        <dd><a href="">完成<span class="layui-badge">18</span></a></dd>
+      </dl>
+    </div>
+    <!--end:快捷搜索-->  
+
+    <script type="text/html" id="foldTpl">
+      <i lay-event="fold" class="fold">+</i>
+    </script>
+    <script type="text/html" id="statusTpl">
+      <a lay-event="orderStatus">{{setOrderStatus(d.status)}}</a>
+    </script>
+    <script type="text/html" id="excepCostTpl">
+      {{setExcepCost(d.excepCost)}}
+    </script>
+    <script type="text/html" id="orderNoTpl">
+      <a lay-event="orderDetail" style="color:#34a8ff;">{{setOrderNo(d.orderNo)}}</a>
+    </script>
+    <script type="text/html" id="soTpl">
+      {{# if(d.so.split(';').length > 0){ }}
+        {{d.so.split(';').join(' || ')}}
+      {{# } }}
+    </script>
+    <script type="text/html" id="boxTypeTpl">
+      {{# var $boxTypeArr = d.boxType.split(';') }}
+      {{# var $newArr = [] }}
+      {{# var $newItem }}
+      {{# if($boxTypeArr.length > 0){ }}
+        {{# for( var $k = 0; $k < $boxTypeArr.length; $k++){ }}
+          {{# if($boxTypeArr[$k].indexOf('RF') > -1){ }}
+            {{# $newItem = '<span style="color:#34a8ff;">' + $boxTypeArr[$k] + '</span>' }}
+          {{# }else{ }}
+              {{# $newItem = $boxTypeArr[$k] }}
+          {{# } }}
+          {{# $newArr.push($newItem) }}
+        {{# } }}
+        {{$newArr.join(' || ')}}
+      {{# } }}
+    </script>
+    <script type="text/html" id="addressTpl">
+      {{# if(d.address != null){ }}
+        {{# var $newArr = d.address.split(';') }}
+        {{# if($newArr.length > 0){ }}
+          {{# $newArr = deWeightArr($newArr) }}
+          {{$newArr.join(' || ')}}
+        {{# } }}
+      {{# }else{ }}--{{# } }}
+    </script>
+    <script type="text/html" id="doarkTimeTpl">
+      {{# if(d.doarkTime.split(';').length > 0){ }}
+        {{ new Date(d.doarkTime.split(';')[0]).format('MM-dd hh:mm') }}
+      {{# } }}
+    </script>
+    <script type="text/html" id="cutOffTimeTpl">
+      {{# if(d.cutOffTime.split(';').length > 0){ }}
+        {{ new Date(d.cutOffTime.split(';')[0]).format('MM-dd hh:mm') }}
+      {{# } }}
+    </script>
+    <script type="text/html" id="singleTypeTpl">
+      {{setSingleType(d.singleType)}}
+    </script>
+    <script type="text/html" id="entrustServiceTpl">
+      {{setEntrustService(d.entrustService)}}
+    </script>
+    <script type="text/html" id="waybillStatusTpl">
+      {{setStatus(d.status)}}
+    </script>
+    <script type="text/html" id="waybillSoTpl">
+      {{# if(d.so != null){ }}
+        {{d.so}}
+      {{# }else{ }}
+        ----
+      {{# } }}
+    </script>
+    <script type="text/html" id="waybillArkTypeTpl">
+      {{# if(d.arkType != null){ }}
+        {{# if(d.arkType.indexOf('RF') > -1){ }}
+          <span style="color:#34a8ff;">{{d.arkType}}</span>
+        {{# }else{ }}
+          {{d.arkType}}
+        {{# } }}
+      {{# } }}
+    </script>
+    <script type="text/html" id="waybillEntrustDateTpl">
+      {{ new Date(d.entrustDate).format('MM-dd hh:mm') }}
+    </script>
+    <script type="text/html" id="waybillDoarkDateTpl">
+      {{ new Date(d.doarkDate).format('MM-dd hh:mm') }}
+    </script>
+    <script type="text/html" id="waybillCutoffTimeTpl">
+      {{ new Date(d.cutoffTime).format('MM-dd hh:mm') }}
+    </script>
+    <script type="text/html" id="waybillPutarkPositionTpl">
+      {{setPutarkPosition(d.putarkPosition)}}
+    </script>
+    <script type="text/html" id="waybillAddressTpl">
+      {{# var $newArr = d.address.split(';') }}
+      {{# if($newArr.length > 0){ }}
+        {{# $newArr = deWeightArr($newArr) }}
+        {{$newArr.join(' || ')}}
+      {{# } }}
+    </script>
+    <script type="text/html" id="waybillEmptyAddressTpl">
+      {{# if(d.emptyAddress != null){ }}
+        {{# if(d.status == 321){ }}
+          <span style="color:#f00;"><b>{{d.emptyAddress}}</b></span>
+        {{# }else{ }}
+          {{d.emptyAddress}}
+        {{# } }}
+      {{# } }}
+    </script>
+    <script type="text/html" id="waybillAbnormalCostTpl">
+      {{# if(d.abnormalCost != null){ }}
+        <span style="color:#f00;">{{d.abnormalCost}}</span>
+      {{# }else{ }}0{{# } }}
+    </script>
+  </body>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'tms_tab', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    //点击更多搜索
+    $('.search-more').on('click', function(){
+      if($('searchMore').is(':hidden')){
+        $('searchMore').show();
+      }else{
+        $('searchMore').hide();
+      }
+    });
+
+    //初始化日期时间
+    laydate.render({
+      elem: '#doArkTimeStart'
+      ,type: 'datetime'
+    });
+    laydate.render({
+      elem: '#doArkTimeEnd'
+      ,type: 'datetime'
+    });
+
+    //初始化表格数据
+    setTableData({});
+
+    //监听提交
+    form.on('submit(search)', function(data){
+      var v1 = data.field.doArkTimeStart, v2 = data.field.doArkTimeEnd;
+      if(v1.length > 0 && v2.length == 0){
+        layer.msg('请选择截止时间');
+        return false;
+      }
+      if(v1.length == 0 && v2.length > 0){
+        layer.msg('请选择起始时间');
+        return false;
+      }
+      if(v1.length > 0 && v2.length > 0){
+        v1 = new Date(v1);
+        v2 = new Date(v2);
+        if(v1 >= v2){
+          layer.msg('截止时间要大于起始时间');
+          return false;
+        }
+      }
+
+      var $saveData = {};
+      if($('searchMore').is(':hidden')){
+        $saveData.onlyOrder = data.field.onlyOrder;
+        $saveData.orderNo = data.field.orderNo;
+        $saveData.onlyDoArkTime = data.field.onlyDoArkTime;
+        $saveData.doArkTimeStart = data.field.doArkTimeStart;
+        $saveData.doArkTimeEnd = data.field.doArkTimeEnd;
+        $saveData.status = data.field.status;
+      }else{
+        $saveData = data.field;
+      }
+      setTableData($saveData);
+      return false;
+    });
+    
+    //方法级渲染
+    function setTableData($searchData){
+      var $pageSize = 18;
+
+      table.render({
+        elem: '#tableList',
+        url: '/ucenter/tms/order/order/page.shtml',
+        method: 'post',
+        where: $searchData,
+        response: {
+          statusCode: 'SUCCESS',
+          countName: 'objects.total',
+          dataName: 'objects.list'
+        },
+        request: {
+          pageName: 'pageNum',
+          limitName: 'pageSize'
+        },
+        cols: [[
+          {title: '', width:50, align: 'center', templet: '#foldTpl'},
+          {checkbox: true, width:40},
+          {field:'id', title: '序号', width:80, sort: true, align: 'center'},
+          {field:'status', title: '状态', width:80, sort: true, align: 'center', templet: '#statusTpl'},
+          {field:'orderNo', title: '订单号码', width:140, sort: true, align: 'center', templet: '#orderNoTpl'},
+          {field:'so', title: 'S/O', width:140, sort: true, align: 'center', templet: '#soTpl'},
+          {field:'arkNo', title: '柜号/铅封号', width:110, sort: true, align: 'center'},
+          {field:'boxType', title: '箱型/箱量', width:110, align: 'center', templet: '#boxTypeTpl'},
+          {field:'address', title: '装卸地点', width:110, align: 'center', templet: '#addressTpl'},
+          {field:'doarkTime', title: '做柜时间', width:100, sort: true, align: 'center', templet: '#doarkTimeTpl'},
+          {field:'cutOffTime', title: '截关时间', width:100, sort: true, align: 'center', templet: '#cutOffTimeTpl'},
+          {field:'orderCost', title: '订单费用', width:90, sort: true, align: 'center'},
+          {field:'excepCost', title: '异常费用', width:90, sort: true, align: 'center', templet: '#excepCostTpl'},
+          {field:'singleType', title: '急单类型', width:90, align: 'center', templet: '#singleTypeTpl'},
+          {field:'carCard', title: '车牌', width:110, align: 'center'},
+          {field:'driverMobile', title: '司机手机', width:110, align: 'center'},
+          {field:'entrustService', title: '委托服务', width:100, align: 'center', templet: '#entrustServiceTpl'},
+          {field:'carrier', title: '运输企业', width:110, align: 'center'},
+          {field:'makeOrderMan', title: '下单人', width:100, align: 'center'}
+        ]],
+        id: 'dataReload',
+        page: true,
+        limits: [15, 30, 50, 100],
+        limit: $pageSize,
+        height: 'full-130',
+        even: true,
+        size: 'sm',
+        done: function(res, curr, count){}
+      });
+
+      //添加快捷搜索
+      var $shortBarHtml = $('#shortBar').html();
+      $('.layui-table-tool').prepend('<div class="short-bar">' + $shortBarHtml + '</div>');
+    }
+
+    //运单配置
+    function waybillOptions($oid){
+      var $options = {
+        elem: '#subTableList' + $oid,
+        url: '/ucenter/tms/waybill/waybill/search.shtml?orderId=' + $oid,
+        response: {
+          statusCode: 'SUCCESS',
+          dataName: 'objects'
+        },
+        cols: [[
+          {checkbox: true, fixed: true},
+          {field:'id', title: '序号', width:80, sort: true, align: 'center'},
+          {field:'status', title: '状态', width:90, sort: true, align: 'center', templet: '#waybillStatusTpl'},
+          {field:'so', title: 'S/O', width:125, sort: true, align: 'center', templet: '#waybillSoTpl'},
+          {field:'arkNo', title: '柜号', width:120, sort: true, align: 'center'},
+          {field:'sealNo', title: '铅封号', width:120, sort: true, align: 'center'},
+          {field:'entrustDate', title: '委托时间', width:100, sort: true, align: 'center', templet: '#waybillEntrustDateTpl'},
+          {field:'doarkDate', title: '做柜时间', width:100, sort: true, align: 'center', templet: '#waybillDoarkDateTpl'},
+          {field:'cutoffTime', title: '截关时间', width:100, sort: true, align: 'center', templet: '#waybillCutoffTimeTpl'},
+          {field:'arkType', title: '箱型', width:60, sort: true, align: 'center', templet: '#waybillArkTypeTpl'},
+          {field:'putarkPosition', title: '位置', width:60, align: 'center', templet: '#waybillPutarkPositionTpl'},
+          {field:'goodsWeight', title: '货重KG', sort: true, width:80, align: 'center'},
+          {field:'address', title: '装卸地点', width:100, align: 'center', templet: '#waybillAddressTpl'},
+          {field:'heavyAddress', title: '提重/返重地点', width:110, align: 'center'},
+          {field:'emptyAddress', title: '提空/返空地点', width:110, align: 'center', templet: '#waybillEmptyAddressTpl'},
+          {field:'carNo', title: '车牌', width:110, align: 'center'},
+          {field:'driverMobile', title: '司机手机', width:110, align: 'center'},
+          {field:'freight', title: '运费', width:80, sort: true, align: 'center'},
+          {field:'abnormalCost', title: '异常费用', width:90, sort: true, align: 'center', templet: '#waybillAbnormalCostTpl'},
+          {field:'transportCompany', title: '运输企业', width:100, align: 'center'}
+        ]],
+        id: 'subDataReload' + $oid,
+        page: false,
+        loading: true,
+        //height: 'auto',  //5行211
+        width: '1915'
+      }
+      return $options;
+    }
+
+    //监听工具条
+    table.on('tool(tbar)', function(obj){
+      var data = obj.data;
+      //展开
+      if(obj.event === 'fold'){
+        if($('#sub' + data.id).length == 0){
+          $('.sub-tr').remove();
+          $('.fold').text('+');
+          var $trHtml = '<tr class="sub-tr" id="sub' + data.id + '">' +
+                        '<td style="background:#e2e2e2;" align="center">运<br>单<br>列<br>表</td>' +
+                        '<td colspan="18" style="background:#e2e2e2; padding:0;" class="sub-table">' +
+                        '<table class="layui-hide" id="subTableList' + data.id + '" lay-filter="subTbar' + data.id + '"></table>' +
+                        '<div class="sub-tool-bar" id="toolBar' + data.id + '">' +
+                        '<a class="layui-btn layui-btn-small" data-type="delData">删除</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="editData">编辑</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="entrust">委托</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="entrustCancle">撤销委托</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="addArk">加柜</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="arkFee">缴约柜费</a>' +
+                        '<a class="layui-btn layui-btn-small" data-type="arkCancle">申请撤柜</a>' +
+                        '</div></td></tr>';
+          $(this).text('-').parent().parent().parent().after($trHtml);
+
+          //渲染运单
+          table.render(waybillOptions(data.id));
+
+          var subActive = {
+            //删除
+            delData: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+                  
+              if(subData.length == 0){
+                parent.layer.alert('请选择需删除的运单！');
+              }else{
+                parent.layer.confirm('你确定要删除所选择的运单吗？', function(index){
+                  var $waybillIds = [],
+                      $is200 = [];
+                  for(var $i = 0; $i < subData.length; $i++){
+                    if(subData[$i].status == 100){
+                      $waybillIds.push(subData[$i].id);
+                    }else if(subData[$i].status == 300){
+                      $waybillIds.push(subData[$i].id);
+                    }else{
+                      $is200.push(1);
+                    }
+                  }
+
+                  if($is200.length > 0){
+                    parent.layer.msg('未委托或已接单的运单将被删除，<br>其它状态的运单不能删除！');
+                    if($waybillIds.length > 0){
+                      setTimeout(function(){delWaybillData($waybillIds)}, 3000);
+                    }
+                  }else{
+                    delWaybillData($waybillIds);
+                  }
+
+                  //删除接口
+                  function delWaybillData(ids){
+                    var $saveData = {waybillIds: ids};
+                    $.ajax({
+                      type:'POST', 
+                      url:'/ucenter/tms/waybill/waybill/deleteWaybillBatch.shtml', 
+                      dataType:"json",      
+                      contentType:"application/json",               
+                      data:JSON.stringify($saveData), 
+                      success:function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                            
+                        if($code === 'SUCCESS'){
+                          window.location.reload();
+                        }else if($code === 'WARNING_WAYBILL_RECEIPTLIST'){
+                          parent.layer.msg($msg);
+                        }else if($code === 'WARNING_WAYBILL_NOTENTRUST'){
+                          parent.layer.msg($msg);
+                        }else{
+                          parent.layer.msg('操作失败！');
+                        }
+                      }
+                    });
+                    return false;
+                  }
+                  
+                  parent.layer.close(index);
+                });
+              }
+            },
+            //编辑
+            editData: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              if(subData.length == 0){
+                parent.layer.alert('你还未选中数据！');
+              }else if(subData.length > 1){
+                parent.layer.alert('只能选择一条数据！');
+              }else{
+                tmsTab.add($(this), '编辑运单（' + subData[0].id + '）', 'modify.html?do=edit&id=' + subData[0].id);
+              }
+            },
+            //委托
+            entrust: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              var $orderId, $orderDetail, $carrier, $carrierId, $singleType, $orderShipping, $isCut = [];
+              var $saveData = {};
+              if(subData.length == 0){
+                parent.layer.alert('请先选择运单！');
+              }else{
+                $orderId = subData[0].orderId;
+                $orderDetail = orderDetail($orderId);
+                $carrier = $orderDetail.carrier;
+                $carrierId = $orderDetail.carrierId;
+                $singleType = $orderDetail.singleType;
+                $orderShipping = $orderDetail.orderShipping;
+
+                //急单类型为赶补料时，截补料时间未填写时，提示”急单类型为【赶补料】时，需要填写截补料时间！
+                if($singleType == 3){
+                  if($orderShipping != null){
+                    for(var $n = 0; $n < $orderShipping.length; $n++){
+                      $orderShipping.cuttingTime == null ? $isCut.push(1) : '';
+                    }
+                  }else{
+                    $isCut.push(1);
+                  }
+                }
+                if($isCut.length > 0){
+                  parent.layer.msg('需要填写截补料时间！');
+                  return false;
+                }
+
+                var $wbIds = [],
+                    $wbList = [],
+                    $isGoon = [],
+                    $is200 = [];
+                for(var $i = 0; $i < subData.length; $i++){
+                  var $wbItem = {};
+                  if(subData[$i].status >= 100 && subData[$i].status < 200){
+                    //如果S/O、提重（返重）地点、截关时间未填写，提示用户”S/O、提重（返重）地点、截关时间未填写，是否继续委托？
+                    if(subData[$i].so == null || subData[$i].cutoffTime == null || subData[$i].heavyAddress == null){
+                      $isGoon.push(1);
+                    }
+                    $wbItem.id = subData[$i].id;
+                    $wbItem.arkType = subData[$i].arkType;
+                    $wbItem.transportCompanyId = $carrierId;
+                    $wbItem.transportCompany = $carrier;
+                    $wbList.push($wbItem);
+                    $wbIds.push(subData[$i].id);
+                  }else{
+                    $is200.push(1);
+                  }
+                }
+
+                $saveData.orderId = $orderId;
+                $saveData.wbList = $wbList;
+
+                if($wbList.length == 0){
+                  parent.layer.msg('没有可以委托的运单！');
+                  return false;
+                }
+                if($is200.length > 0){
+                  parent.layer.msg('录入状态的运单将被委托，<br>其它状态的运单不能委托！');
+                  setTimeout(function(){
+                    isGoonEntrust($isGoon, $saveData, $wbIds);
+                  }, 3000);
+                }else{
+                  isGoonEntrust($isGoon, $saveData, $wbIds);
+                }
+
+                //是否继续委托
+                function isGoonEntrust(g, objs, ids){
+                  if(g.length > 0){
+                    parent.layer.confirm('S/O、提重（返重）地点、截关时间未填写，是否继续委托？', {btn: ['是', '否']}, function(index){
+                      entrustWaybillData(objs, ids);
+                      parent.layer.close(index);
+                    });
+                  }else{
+                    entrustWaybillData(objs, ids);
+                  }
+                }
+
+                //委托接口
+                function entrustWaybillData(objs, ids){
+                  var $transportCompanyId = objs.wbList[0].transportCompanyId,
+                      $transportCompany = objs.wbList[0].transportCompany;
+
+                  //获取供应商
+                  var $supplierArrs = getSupplierList();
+                  var $html = '<select name="supplier">';
+                  for(var $j = 0; $j < $supplierArrs.length; $j++){
+                    var $selected = $supplierArrs[$j].id == $transportCompanyId ? 'selected="selected"' : '';
+                    $html += '<option value="' + $supplierArrs[$j].id + '/' + $supplierArrs[$j].nameShort + '" ' + $selected + '>' + $supplierArrs[$j].nameShort + '</option>';
+                  }
+                  $html += '</select>';
+
+                  layer.open({
+                    type: 1,
+                    title: '委托运单（' + ids.join(' || ') + '）',
+                    area: ['500px', '80%'],
+                    shade: 0.01,
+                    shadeClose: true,
+                    content: '<div class="layui-form layui-form-pane" style="margin:30px;"><div class="layui-form-item">' +
+                            '<label class="layui-form-label">供应商</label>' +
+                            '<div class="layui-input-block">' + $html + '</div>' +
+                            '</div></div>',
+                    btn: ['确定', '取消'],
+                    yes: function(index){
+                      var $supplierVal = $('select[name="supplier"]').val().split('/');
+                      var $nSaveData = {};
+                      var $nWbList = [];
+                      for(var $m = 0; $m < objs.wbList.length; $m++){
+                        var $nWbItem = {};
+                        $nWbItem.id = objs.wbList[$m].id;
+                        $nWbItem.arkType = objs.wbList[$m].arkType;
+                        $nWbItem.transportCompanyId = parseInt($supplierVal[0]);
+                        $nWbItem.transportCompany = $supplierVal[1];
+                        $nWbList.push($nWbItem);
+                      }
+
+                      $nSaveData.orderId = objs.orderId;
+                      $nSaveData.wbList = $nWbList;
+
+                      //调用接口
+                      $.ajax({
+                        type:'POST', 
+                        url:'/ucenter/tms/waybill/waybill/entrustment.shtml', 
+                        dataType:"json",      
+                        contentType:"application/json",               
+                        data:JSON.stringify($nSaveData), 
+                        success:function(d){
+                          var $code = d.code,
+                              $msg = d.msg,
+                              $objects = d.objects;
+                              
+                          if($code === 'SUCCESS'){
+                            window.location.reload();
+                            layer.close(index);
+                          }else if($code === 'ERROR_ORDER_ONLY_INPUTTING'){
+                            parent.layer.msg($msg);
+                          }else if($code === 'WARNING_NOT_AGREEBOXTYPE'){
+                            parent.layer.msg($msg);
+                          }else{
+                            parent.layer.msg('操作失败！');
+                          }
+                        }
+                      });
+                      return false;
+                    }
+                  });
+                  form.render('select');
+                }
+              }
+            },
+            //撤销委托
+            entrustCancle: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              var $orderId, $saveData = {};
+              if(subData.length == 0){
+                parent.layer.alert('请先选择运单！');
+              }else{
+                $orderId = subData[0].orderId;
+                var $waybillIds = [],
+                    $is100 = [],
+                    $is300 = [];
+                for(var $i = 0; $i < subData.length; $i++){
+                  if(subData[$i].status >= 100 && subData[$i].status < 200){
+                    $is100.push(1);
+                  }else if(subData[$i].status >= 300){
+                    $is300.push(1);
+                  }else{
+                    $waybillIds.push(subData[$i].id);
+                  }
+                }
+
+                $saveData.orderId = $orderId;
+                $saveData.ids = $waybillIds;
+
+                if($is300.length > 0){
+                  parent.layer.msg('拖车行已接单，不能撤回！');
+                  return false;
+                }else if($is100.length > 0){
+                  parent.layer.msg('订单尚未委托，不能撤回！');
+                  return false;
+                }else{
+                  parent.layer.confirm('确定要取消委托吗？', function(index){
+                    cancleWaybillData($saveData);
+                    parent.layer.close(index);
+                  });
+                }
+
+                //撤销委托接口
+                function cancleWaybillData(objs){
+                  $.ajax({
+                    type:'POST', 
+                    url:'/ucenter/tms/waybill/waybill/recallEntrustment.shtml', 
+                    dataType:"json",      
+                    contentType:"application/json",               
+                    data:JSON.stringify(objs), 
+                    success:function(d){
+                      var $code = d.code,
+                          $msg = d.msg,
+                          $objects = d.objects;
+                          
+                      if($code === 'SUCCESS'){
+                        window.location.reload();
+                      }else if($code === 'WARNING_WAYBILL_WAS_ORDER'){
+                        parent.layer.msg($msg);
+                      }else if($code === 'WARNING_WAYBILL_WASNOT_ORDER'){
+                        parent.layer.msg($msg);
+                      }else{
+                        parent.layer.msg('操作失败！');
+                      }
+                    }
+                  });
+                  return false;
+                }
+              }
+            },
+            //加柜
+            addArk: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              var $saveData = {};
+                  $saveData.apList = [];
+              if(subData.length == 0){
+                parent.layer.alert('请先选择运单！');
+              }else{
+                for(var $i = 0; $i < subData.length; $i++){
+                  var $wbItem = {};
+                  $wbItem.orderId = subData[$i].orderId != null ? subData[$i].orderId : '';
+                  $wbItem.id = subData[$i].id != null ? subData[$i].id : '';
+                  $wbItem.soNo = subData[$i].soId != null ? subData[$i].soId : '';
+                  $wbItem.soNumber = subData[$i].so != null ? subData[$i].so : '';
+                  $wbItem.orderBoxtypeId = subData[$i].orderBoxtypeId != null ? subData[$i].orderBoxtypeId : '';
+                  $wbItem.arkNo = subData[$i].arkNo != null ? subData[$i].arkNo : '';
+                  $wbItem.sealNo = subData[$i].sealNo != null ? subData[$i].sealNo : '';
+                  $wbItem.entrustDate = subData[$i].entrustDate != null ? subData[$i].entrustDate : '';
+                  $wbItem.doarkDate = subData[$i].doarkDate != null ? subData[$i].doarkDate : '';
+                  $wbItem.cutoffTime = subData[$i].cutoffTime != null ? subData[$i].cutoffTime : '';
+                  $wbItem.arkType = subData[$i].arkType != null ? subData[$i].arkType : '';
+                  $wbItem.putarkPosition = subData[$i].putarkPosition != null ? subData[$i].putarkPosition : '';
+                  $wbItem.goodsWeight = subData[$i].goodsWeight != null ? subData[$i].goodsWeight : '';
+                  $wbItem.addressId = subData[$i].addressId != null ? subData[$i].addressId : '';
+                  $wbItem.address = subData[$i].address != null ? subData[$i].address : '';
+                  $wbItem.heavyAddressCode = subData[$i].heavyAddressCode != null ? subData[$i].heavyAddressCode : '';
+                  $wbItem.heavyAddress = subData[$i].heavyAddress != null ? subData[$i].heavyAddress : '';
+                  $wbItem.emptyAddressCode = subData[$i].emptyAddressCode != null ? subData[$i].emptyAddressCode : '';
+                  $wbItem.emptyAddress = subData[$i].emptyAddress != null ? subData[$i].emptyAddress : '';
+                  $wbItem.driverMobile = subData[$i].driverMobile != null ? subData[$i].driverMobile : '';
+                  $wbItem.carNo = subData[$i].carNo != null ? subData[$i].carNo : '';
+                  $wbItem.transportCompany = subData[$i].transportCompany != null ? subData[$i].transportCompany : '';
+                  $wbItem.transportCompanyId = subData[$i].transportCompanyId != null ? parseInt(subData[$i].transportCompanyId) : '';
+                  $wbItem.freight = subData[$i].freight != null ? subData[$i].freight : '';
+                  $saveData.apList.push($wbItem);
+                }
+                addArkData($saveData);
+
+                //加柜接口
+                function addArkData(objs){
+                  parent.layer.confirm('确定要加柜吗？', function(index){
+                    $.ajax({
+                      type:'POST', 
+                      url:'/ucenter/tms/waybill/waybill/add.shtml', 
+                      dataType:"json",      
+                      contentType:"application/json",               
+                      data:JSON.stringify(objs), 
+                      success:function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                            
+                        if($code === 'SUCCESS'){
+                          window.location.reload();
+                        }else{
+                          parent.layer.msg('操作失败！');
+                        }
+                      }
+                    });
+                    parent.layer.close(index);
+                    return false;
+                  });
+                }
+              }
+            },
+            //缴约柜费
+            arkFee: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              if(subData.length == 0){
+                parent.layer.alert('请先选择运单！');
+              }else{
+                var $waybillIds = [],
+                    $isArkFee = [];
+                for(var $i = 0; $i < subData.length; $i++){
+                  if(subData[$i].status == 321 || subData[$i].status == 320){
+                    $waybillIds.push(subData[$i].id);
+                  }else{
+                    $isArkFee.push(1);
+                  }
+                }
+
+                if($waybillIds.length == 0){
+                  parent.layer.msg('没有可以缴约柜费的运单！');
+                  return false;
+                }
+                if($isArkFee.length > 0){
+                  parent.layer.msg('只有催缴约柜费或已打EIR单的运单才能缴约柜费！');
+                  setTimeout(function(){
+                    arkFeeData($waybillIds);
+                  }, 3000);
+                }else{
+                  arkFeeData($waybillIds);
+                }
+
+                //缴约柜费接口
+                function arkFeeData(ids){
+                  parent.layer.confirm('确定要缴约柜费吗？', function(index){
+                    var $saveData = {ids: ids};
+                    $.ajax({
+                      type:'POST', 
+                      url:'/ucenter/tms/waybill/waybill/shipperPayCost.shtml', 
+                      dataType:"json",      
+                      contentType:"application/json",               
+                      data:JSON.stringify($saveData), 
+                      success:function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                            
+                        if($code === 'SUCCESS'){
+                          window.location.reload();
+                        }else if($code === 'WARNING_WAYBILL_CANPAYCOST'){
+                          parent.layer.msg($msg);
+                        }else{
+                          parent.layer.msg('操作失败！');
+                        }
+                      }
+                    });
+                    parent.layer.close(index);
+                    return false;
+                  });
+                }
+              }
+            },
+            //申请撤柜
+            arkCancle: function(){
+              var checkStatus = table.checkStatus('subDataReload' + data.id),
+                  subData = checkStatus.data;
+
+              if(subData.length == 0){
+                parent.layer.alert('请先选择运单！');
+              }else{
+                var $waybillIds = [],
+                    $isArkCancle = [];
+                for(var $i = 0; $i < subData.length; $i++){
+                  if(subData[$i].status >= 300 && subData[$i].status < 420 && subData[$i].status != 311 && subData[$i].status != 310){
+                    $waybillIds.push(subData[$i].id);
+                  }else{
+                    $isArkCancle.push(1);
+                  }
+                }
+
+                if($waybillIds.length == 0){
+                  parent.layer.msg('没有可以申请撤柜的运单！');
+                  return false;
+                }
+                if($isArkCancle.length > 0){
+                  parent.layer.msg('当前状态不能申请撤柜！');
+                  setTimeout(function(){
+                    arkCancleData($waybillIds);
+                  }, 3000);
+                }else{
+                  arkCancleData($waybillIds);
+                }
+
+                console.log($waybillIds);
+
+                //申请撤柜接口
+                function arkCancleData(ids){
+                  parent.layer.confirm('确认要取消该柜的运输吗？', function(index){
+                    var $saveData = {ids: ids};
+                    $.ajax({
+                      type:'POST', 
+                      url:'/ucenter/tms/waybill/waybill/applyRemoveArk.shtml', 
+                      dataType:"json",      
+                      contentType:"application/json",               
+                      data:JSON.stringify($saveData), 
+                      success:function(d){
+                        var $code = d.code,
+                            $msg = d.msg,
+                            $objects = d.objects;
+                            
+                        if($code === 'SUCCESS'){
+                          window.location.reload();
+                        }else if($code === 'WARNING_WAYBILL_REMOVEARK'){
+                          parent.layer.msg($msg);
+                        }else{
+                          parent.layer.msg('操作失败！');
+                        }
+                      }
+                    });
+                    parent.layer.close(index);
+                    return false;
+                  });
+                }
+              }
+            }
+          }
+
+          $('#toolBar' + data.id + ' a').on('click', function(){
+            var type = $(this).data('type');
+            subActive[type] ? subActive[type].call(this) : '';
+          });
+
+          table.on('tool(subTbar' + data.id + ')', function(subObj){
+            var subData = subObj.data;
+            //展开
+            if(subObj.event === 'soDetail'){
+              tmsTab.add($(this), '查看运单（' + subData.so + ' / ' + subData.id + '）的详情', 'modify.html?do=detail&id=' + subData.id);
+            }
+          });
+        }else{
+          $(this).text('+');
+          $('#sub' + data.id).remove();
+        }
+      }else if(obj.event === 'orderStatus'){
+        parent.layer.open({
+          type: 2,
+          title: '查看订单（' + data.orderNo + '）的订单状态',
+          shadeClose: true,
+          shade: 0.8,
+          area: ['90%', '90%'],
+          content: 'orderStatus.html?id=' + data.id
+        });
+      }else if(obj.event === 'orderDetail'){
+        tmsTab.add($(this), '查看订单（' + data.orderNo + '）的详情', 'modify.html?do=detail&id=' + data.id);
+      }
+    });
+
+    var active = {
+      //全部
+      allData: function(){
+        setTableData({});
+        //window.location.reload();
+      },
+      //新增
+      addData: function(){
+        tmsTab.add($(this), '新增订单', 'modify.html?do=add');
+      },
+      //编辑
+      editData: function(){ //获取选中数据
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          tmsTab.add($(this), '编辑订单（' + data[0].orderNo + '）', 'modify.html?do=edit&id=' + data[0].id);
+        }
+      },
+      //删除
+      delData: function(){
+        var $cLen = $('table .layui-form-checked').not('.sub-tr .layui-form-checkbox').length;
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+            
+        if($cLen == 0){
+          parent.layer.alert('请选择需删除的订单！');
+        }else{
+          parent.layer.confirm('你确定要删除所选择的订单吗？', function(index){
+            var $ids = [],
+                $is200 = [],
+                $is300 = [];
+            for(var $i = 0; $i < data.length; $i++){
+              if(data[$i].status == 100){
+                $ids.push(data[$i].id);
+              }else if(data[$i].status == 200){
+                $is200.push(1);
+              }else{
+                $is300.push(1);
+              }
+            }
+
+            if($is200.length > 0){
+              parent.layer.msg('录入状态的订单将被删除，<br>委托以后的订单不能删除！');
+              if($ids.length > 0){
+                setTimeout(function(){delOrderData($ids)}, 3000);
+              }
+            }else if($is300.length > 0){
+              parent.layer.msg('录入状态的订单将被删除，<br>派单以后的订单不能删除！');
+              if($ids.length > 0){
+                setTimeout(function(){delOrderData($ids)}, 3000);
+              }
+            }else{
+              delOrderData($ids);
+            }
+
+            //删除接口
+            function delOrderData(ids){
+              var $saveData = {ids: ids};
+              $.ajax({
+                type:'POST', 
+                url:'/ucenter/tms/order/order/deleteOrderBatch.shtml', 
+                dataType:"json",      
+                contentType:"application/json",               
+                data:JSON.stringify($saveData), 
+                success:function(d){
+                  var $code = d.code,
+                      $msg = d.msg,
+                      $objects = d.objects;
+                      
+                  if($code === 'SUCCESS'){
+                    window.location.reload();
+                  }else if($code === 'WARNING_ORDER_DELETE'){
+                    parent.layer.msg($msg);
+                  }else if($code === 'WARNING_ORDER_PAIDANDELETE'){
+                    parent.layer.msg($msg);
+                  }else if($code === 'WARNING_ORDER_ONLYDELETE'){
+                    parent.layer.msg($msg);
+                  }else{
+                    parent.layer.msg('操作失败！');
+                  }
+                }
+              });
+              return false;
+            }
+            
+            parent.layer.close(index);
+          });
+        }
+      },
+      uploadAttachment: function(){
+
+      },
+      copy: function(){
+        var checkStatus = table.checkStatus('dataReload'),
+            data = checkStatus.data;
+        if(data.length == 0){
+          parent.layer.alert('你还未选中数据！');
+        }else if(data.length > 1){
+          parent.layer.alert('只能选择一条数据！');
+        }else{
+          //todo
+        }
+      }
+    };
+  
+    $('.btns-bar .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    //获取订单详情
+    function orderDetail(oid){
+      var $obj = {};
+      $.ajax({
+        type: 'GET',
+        url: '/ucenter/tms/order/order/getDetail.shtml',
+        data: 'orderId=' + oid,
+        async: false,
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+              
+          if($code === 'SUCCESS'){
+            $obj = $objects;
+          }
+        }
+      });
+      return $obj;
+    }
+
+    //获取供应商列表
+    function getSupplierList(){
+      var $arr = [];
+      $.ajax({
+        type: 'GET',
+        url: '/ucenter/crm/supplier/supplier/page.shtml',
+        data: 'pageNum=-1',
+        async: false,
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+              
+          if($code === 'SUCCESS'){
+            $arr = $objects.list;
+          }
+        }
+      });
+      return $arr;
+    }
+  });
+  </script>
+</html>

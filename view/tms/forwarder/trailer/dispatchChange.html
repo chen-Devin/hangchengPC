@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>改派 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .blue-txt {color:#06f; font-weight:bold;}
+      .layui-table th, .layui-table td {text-align:center; padding:0; height:38px;}
+      .layui-table td input, .layui-table td textarea {border:0;}
+      .hide-box {display:none; text-align:left;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <table class="layui-table">
+        <colgroup>
+          <col width="150"><col width="200"><col width="200">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>派车信息</th><th>改派前</th><th>改派后</th>
+          </tr> 
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="required">*</span>司机姓名</td>
+            <td id="frontDriverName"></td>
+            <td class="editDriver">
+              <span class="blue-txt item" id="postDriverName"></span>
+              <div class="hide-box">
+                <select name="driverName" lay-verify="driverName" lay-filter="driverName"></select>
+                <input name="driverStr" type="hidden">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="required">*</span>司机手机</td>
+            <td id="frontDriverMobile"></td>
+            <td class="editDriver">
+              <span class="blue-txt item" id="postDriverMobile"></span>
+              <div class="hide-box">
+                <input type="text" name="driverMobile" lay-verify="driverMobile" placeholder="司机手机" class="layui-input" maxlength="11">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="required">*</span>拖车车牌</td>
+            <td id="frontDriverCar"></td>
+            <td class="editDriver">
+              <span class="item" id="postDriverCar"></span>
+              <div class="hide-box">
+                <input type="text" name="carNo" lay-verify="carNo" placeholder="拖车车牌" class="layui-input" maxlength="15">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="required">*</span>拖架车牌</td>
+            <td id="frontDriverCarFrame"></td>
+            <td class="editDriver">
+              <span class="item" id="postDriverCarFrame"></span>
+              <div class="hide-box">
+                <input type="text" name="carframeNo" lay-verify="carframeNo" placeholder="拖架车牌" class="layui-input" maxlength="15">
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="required">*</span>改派原因</td>
+            <td colspan="2" style="text-align:left;">
+              <textarea name="toSendReason" lay-verify="toSendReason" placeholder="请输入改派原因，2~300之间" class="layui-textarea" maxlength="300"></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="layui-form-item" style="text-align:center; margin:20px 0 40px;">
+        <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit" style="width:150px;">确认改派</button>
+        <button class="layui-btn layui-btn-primary" id="vclose" type="button" style="width:150px;">取消</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+    var $id = $.trim(getUrlParam('id'));
+    if($id == null || $id == ''){
+      layui.use('layer', function(){
+        parent.layer.alert('非法参数！', {
+          yes: function(){
+            parent.layer.closeAll();
+          }
+        });
+      });
+    }
+
+    layui.use(['form', 'layer', 'layedit'], function(){
+      var form = layui.form,
+          layer = layui.layer,
+          layedit = layui.layedit,
+          $ = layui.jquery;
+
+      //获取派车信息
+      $.get('/ucenter/tms/waybill/waybill/searchChangeSend.shtml', {id: $id}, function(d){
+        var $code = d.code,
+            $msg = d.msg,
+            $objects = d.objects;
+
+          //console.log(d);
+          //return false;
+            
+        if($code === 'SUCCESS'){
+          $('#frontDriverName').text($objects.frontDriverName != null ? $objects.frontDriverName : '--');
+          $('#frontDriverMobile').text($objects.frontDriverMobile != null ? $objects.frontDriverMobile : '--');
+          $('#frontDriverCar').text($objects.frontDriverCar != null ? $objects.frontDriverCar : '--');
+          $('#frontDriverCarFrame').text($objects.frontDriverCarFrame != null ? $objects.frontDriverCarFrame : '--');
+          $('#postDriverName').text($objects.postDriverName != null ? $objects.postDriverName : '--');
+          $('#postDriverMobile').text($objects.postDriverMobile != null ? $objects.postDriverMobile : '--');
+          $('#postDriverCar').text($objects.postDriverCar != null ? $objects.postDriverCar : '--');
+          $('#postDriverCarFrame').text($objects.postDriverCarFrame != null ? $objects.postDriverCarFrame : '--');
+          $('textarea[name="toSendReason"]').val($objects.postSendReason != null ? $objects.postSendReason : '');
+          $('select[name="driverName"]').val($objects.postDriverName != null ? $objects.postDriverName : '');
+          $('input[name="driverMobile"]').val($objects.postDriverMobile != null ? $objects.postDriverMobile : '');
+          $('input[name="carNo"]').val($objects.postDriverCar != null ? $objects.postDriverCar : '');
+          $('input[name="carframeNo"]').val($objects.postDriverCarFrame != null ? $objects.postDriverCarFrame : '');
+          form.render('select');
+        }
+      }, 'JSON');
+
+      //初始化司机列表
+      var $driverStr = $('input[name="driverStr"]');
+      var $driver = getDriverList();
+      if($driver.length > 0){
+        var $driverIds = [];
+        for(var $j = 0; $j < $driver.length; $j++){
+          $('select[name="driverName"]').append('<option value="' + $driver[$j].name + '">' + $driver[$j].name + '</option>');
+          $driverIds.push($driver[$j].id);
+        }
+        $driverStr.val($driverIds.join(','));
+        form.render('select');
+      }
+
+      form.on('select(driverName)', function(data){
+        if($driverStr.val().length > 0){
+          var $index = $(this).index(),
+              $driverId = $driverStr.val().split(',')[$index],
+              $driverDetail = getDriverById($driverId);
+
+          if($driverDetail != null){
+            $('input[name="driverMobile"]').val($driverDetail.mobile != null ? $driverDetail.mobile : '');
+            $('input[name="carNo"]').val($driverDetail.carNo != null ? $driverDetail.carNo : '');
+          }
+        }
+      });
+
+      //自定义验证规则
+      form.verify({
+        driverName: function(val){
+          if(val.length == 0){
+            return '请选择司机';
+          }
+        },
+        driverMobile: function(val){
+          if(val.length == 0){
+            return '请输入司机手机';
+          }else if(val.length > 11){
+            return '手机号码为11位纯数字';
+          }else if(!$jsReg.mobile.test(val)){
+            return '手机格式不正确';
+          }
+        },
+        carNo: function(val){
+          if(val.length == 0){
+            return '请输入拖车车牌';
+          }
+        },
+        carframeNo: function(val){
+          if(val.length == 0){
+            return '请输入拖架车牌';
+          }
+        },
+        toSendReason: function(val){
+          if(val.length == 0){
+            return '请输入改派原因';
+          }else if(val.length > 300 || val.length < 2){
+            return '改派原因在2~300字符之间';
+          }
+        }
+      });
+
+      //点击可编辑
+      $('.editDriver').on('click', function(){
+        $('.item').hide();
+        $('.hide-box').show();
+      });
+    
+      //监听提交
+      form.on('submit(submit)', function(data){
+        var $index = $('select[name="driverName"] option:selected').index();
+        var $driverId = $driverStr.val().split(',')[$index];
+        
+        //数据源
+        var $saveData = {
+          id: parseInt($id),
+          carNo: data.field.carNo,
+          carframeNo: data.field.carframeNo,
+          driverId: parseInt($driverId),
+          driverName: data.field.driverName,
+          driverMobile: data.field.driverMobile,
+          toSendReason: data.field.toSendReason
+        };
+
+        // console.log(JSON.stringify($saveData));
+        // return false;
+
+        //保存数据，调用接口
+        $.ajax({
+          type: 'POST', 
+          url: '/ucenter/tms/waybill/waybill/toSend.shtml', 
+          dataType: "json",      
+          contentType: "application/json",               
+          data: JSON.stringify($saveData), 
+          success: function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+                
+            if($code === 'SUCCESS'){
+              parent.layer.alert('改派成功！', {
+                yes: function(){
+                  //关闭窗口
+                  parent.layer.closeAll();
+                  //获取当前框架ID并刷新
+                  var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                  parent['f' + $layId].location.reload();
+                }
+              });
+            }else if($code === 'ERROR_ORDER_CANNOT_TOSEND'){
+              parent.layer.msg($msg);
+            }else{
+              parent.layer.msg('改派失败！');
+            }
+          }
+        });
+        return false;
+      });
+
+      //取消按钮
+      $('#vclose').on('click', function(){
+        parent.layer.closeAll();
+      });
+    });
+  </script>
+</html>

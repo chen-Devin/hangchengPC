@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>核销费用 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="/view/tms/static/css/add.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .layui-form-label {width:150px;}
+      span{height: 38px;line-height:38px}
+      .layui-form-item .layui-input-inline {padding-top: 10px; width:240px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off" style="min-width:80px">
+        <div class="layui-fluid">
+            <div class="layui-row">
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账期期间</label>
+                        <div class="layui-input-block">
+                            <span name="billMonth" id="billMonth"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">账单号</label>
+                        <div class="layui-input-block">
+                            <span id="billNo" name="billNo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">结算方式</label>
+                        <div class="layui-input-block">
+                            <span id="paymentType" name="paymentType"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">总金额（元）</label>
+                        <div class="layui-input-block">
+                            <span id="receiveCost" name="receiveCost"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="layui-row"> 
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">已收金额（元）</label>
+                        <div class="layui-input-block">
+                            <span id="receivedCost" name="receivedCost"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">未收金额（元）</label>
+                        <div class="layui-input-block">
+                            <span id="receivCost" name="receivCost"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span class="required">*</span>收款账户</label>
+                        <div class="layui-input-block">
+                            <select name="channel">
+                                <option value="">请选择</option>
+                              </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span class="required">*</span>收款金额（元）</label>
+                        <div class="layui-input-block">
+                            <input type="text"  name="receivePay" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收款日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="receiveTime" name="receiveTime"  placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                  <div class="layui-form-item">
+                      <label class="layui-form-label">摘要</label>
+                      <div class="layui-input-block">
+                          <textarea id="described" name="described" maxlength="1000" placeholder="" class="layui-textarea" style="min-height:50px;"></textarea>
+                      </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+      <br>
+      <div class="layui-form-item" style="float:right;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="submit" >保存</button>
+        <button class="layui-btn layui-btn-primary btn-cancel" type="button" >取消</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+  layui.use(['form', 'layer', 'table', 'laydate'], function(){
+    var form = layui.form,
+        layer = layui.layer,
+        table = layui.table,
+        laydate = layui.laydate,
+        tmsTab = layui.tms_tab,
+        $ = layui.jquery;
+
+    laydate.render({
+      elem: '#receiveTime' //收款日期
+    });
+
+    var $customerId = $.trim(getUrlParam('customerId'));
+    var $Id = $.trim(getUrlParam('id'));
+    var $lastModifyTime;
+     $.get('/ucenter/general/finance/receivedBills/getConfirmPage.shtml?customerId='+ $customerId +'&id='+ $Id , function(d){
+        for(var $i = 0 ; $i < d.objects.channels.length ;$i++){
+         $('select[name="channel"]').append('<option value="' + d.objects.channels[$i].id + '">' + d.objects.channels[$i].bankName + d.objects.channels[$i].bankBranchName + ':' + d.objects.channels[$i].accountNo + '</option>');
+       }
+       $lastModifyTime = d.objects.bill.modifyDate;
+       $('span[name="billMonth"]').html(d.objects.bill.billMonth);
+       $('span[name="billNo"]').html(d.objects.bill.billNo);
+       $('span[name="paymentType"]').html(d.objects.bill.paymentType);
+       $('span[name="receiveCost"]').html(d.objects.bill.receiveCost);
+       $('span[name="receivedCost"]').html(d.objects.bill.receivedCost);
+       $('span[name="receivCost"]').html((d.objects.bill.receiveCost) - (d.objects.bill.receivedCost));
+       $('span[name="remarks"]').html(d.objects.bill.remarks);
+       form.render();
+     })
+         //监听提交
+    form.on('submit(submit)', function(data){
+       var $channel = $.trim(data.field.channel),
+      $receivePay = $.trim(data.field.receivePay),
+      $receiveTime = $.trim(data.field.receiveTime),
+      $described = $.trim(data.field.described);
+      $lastModifyTime
+      roleStatus($channel, $receivePay, $receiveTime, $described);
+      return false;
+    });
+
+    function roleStatus($channel, $receivePay, $receiveTime, $described){
+      var $saveData = {
+        pkId: $Id,
+        channel: $channel,
+        receivePay: $receivePay,
+        receiveTime: $receiveTime,
+        described: $described,
+        // lastModifyTime: $lastModifyTime
+      }
+       $.ajax({
+        type:'POST',
+        url:'/ucenter/general/finance/confirm/billConfirm.shtml', 
+        dataType:"json",
+        contentType:"application/json",
+        data:JSON.stringify($saveData),
+        success:function(d){
+          var $code = d.code,
+              $msg = d.msg,
+              $objects = d.objects;
+              
+          if($code === 'SUCCESS'){
+            parent.layer.closeAll();
+            parent.layer.msg('操作成功！');
+            //  parent.layer.alert('操作成功！');
+             window.location.reload();
+          }else{
+            parent.layer.alert('操作失败！');
+          }
+        }
+      
+      });
+    }
+     
+   
+
+
+
+
+    $(".btn-cancel").on("click",function(){
+      parent.layer.close(parent.layer.index);
+    });
+    form.render();
+  });
+  </script>
+</html>

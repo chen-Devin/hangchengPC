@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册：填写账户信息 - TMS</title>
+    <link rel="stylesheet" href="../frame/3.3.7/css/bootstrap.min.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/regist.css?v=1.0">
+</head>
+
+<body>
+    <!-- Start:头部 -->
+    <div class="panel-head">
+        <div class="panel-logo">
+            <div class="panel-left"><img src="../frame/static/images/logo.png"><span>用户注册</span></div>
+            <div class="panel-right">已有账号？<a href="/">立即登录</a></div>
+        </div>
+    </div>
+    <!-- End:头部 -->
+
+    <!-- Start:内容 -->
+    <div class="panel-main">
+        <!-- Start:步骤1 -->
+        <div class="panel-register" id="register-step1">
+            <div class="steps-list">
+                <ul class="step1">
+                    <li>1、填写账户信息</li>
+                    <li>2、填写详细信息</li>
+                    <li>3、平台审核</li>
+                </ul>
+            </div>
+            <div class="register-body">
+                <form method="post" autocomplete="off" id="form-regist">
+                    <dl>
+                        <dd>
+                            <div class="form-title"><span>*</span>用户名</div>
+                            <div class="form-group">
+                                <input type="text" autocomplete="off" class="form-input" id="username" name="username" maxlength="20" placeholder="请输入您的用户名">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>登录密码</div>
+                            <div class="form-group">
+                                <input type="password" autocomplete="off" class="form-input" id="password" name="password" maxlength="20" placeholder="请输入登录密码">
+                                <span class="glyphicon glyphicon-eye-open look-pwd" aria-hidden="true"></span>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>确认密码</div>
+                            <div class="form-group">
+                                <input type="password" autocomplete="off" class="form-input" id="password1" name="password1" maxlength="20" placeholder="请再次输入您的密码">
+                                <span class="glyphicon glyphicon-eye-open look-pwd1" aria-hidden="true"></span>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>验证码</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input w-125" id="vcode" name="vcode" maxlength="4" placeholder="请输入验证码">
+                                <div class="form-vcode"><img src="/valicode.shtml?v=1.0" id="vcodeImg"></div>
+                                <div class="form-vcode">看不清？<a id="check-vcode">换一张</a></div>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>手机号</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="mobile" name="mobile" maxlength="11" placeholder="请输入您的手机号">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>短信验证码</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input w-180" id="smscode" name="smscode" maxlength="4" placeholder="短信验证码">
+                                <div class="form-sms" id="check-sms">获取短信验证码</div>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+
+                        <!-- <dd>
+              <div class="form-title">注册邀请码</div>
+              <div class="form-group">
+                <input type="text" class="form-input" id="invitecode" name="invitecode" maxlength="6" placeholder="请输入注册邀请码">
+                <span class="form-error"></span>
+              </div>
+              <div class="clearfix"></div>
+            </dd> -->
+                        <dd>
+                            <div class="form-title" style="line-height:normal;">&nbsp;</div>
+                            <div class="form-group">
+                                <label class="w-335"><input type="checkbox" checked="checked" id="checkstatus" name="checkstatus"> 我已阅读并同意<a href="javascript:void(0);" class="agreement" target="_blank">《服务协议》</a></label>
+                                <span class="form-error" style="line-height:normal;"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title">&nbsp;</div>
+                            <div class="form-group">
+                                <button type="button" class="form-submit" id="step1-btn">下一步</button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title" style="line-height:normal;">&nbsp;</div>
+                            <div class="form-group">
+                                <div class="w-335" style="text-align:right;">已有账号？<a href="/">立即登录</a></div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+        <!-- End:步骤1 -->
+    </div>
+    <!-- End:内容 -->
+
+    <!-- Start:底部 -->
+    <div class="panel-foot">
+        <div class="panel-bottom">
+            <p class="txt1"><a href="http://www.hcwanli.com/gongsijianjie/" target="_blank">关于我们</a>|<a href="http://www.hcwanli.com/xinpinshangxian/" target="_blank">新闻动态</a>|<a href="http://www.hcwanli.com/lianxiwomen/" target="_blank">联系我们</a>|<a href="http://www.hcwanli.com/bangzhuzhongxin/"
+                    target="_blank">帮助中心</a></p>
+            <p class="txt2">&copy; 2017 - 2020 广东航程科技有限公司. All Rights Reserved　<a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备17154150号-11</a></p>
+        </div>
+    </div>
+    <!-- End:底部 -->
+</body>
+<script type="text/javascript" src="../frame/static/js/jquery.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/regist.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/layui/layui.js?v=1.0"></script>
+
+<script>
+    $(function() {
+        regisitStep1();
+
+        //看密码
+        function lookPWD(id, target) {
+            $(id).click(function(ev) {
+                if ($(target).attr("type") === "text") {
+                    $(target).attr("type", "password");
+                } else {
+                    $(target).attr("type", "text");
+                }
+            });
+        }
+
+        lookPWD(".look-pwd", "#password");
+        lookPWD(".look-pwd1", "#password1");
+
+        //查看详细服务协议
+        $(".agreement").on("click", function() {
+            layui.use('layer', function() {
+                var layer = layui.layer;
+                layer.open({
+                    area: ["900px", "700px"],
+                    title: false,
+                    shadeClose: true,
+                    type: 2,
+                    content: "./agreement/agreement.html"
+                });
+            });
+        });
+    });
+</script>
+
+</html>

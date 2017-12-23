@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>派车 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+      body {margin:20px;}
+      span.required {color:#f00; font-family:'simsun', '宋体'; margin-right:5px; font-size:15px;}
+      .form-txt {color:#999; font-size:12px; margin-top:10px; display:block;}
+      .layui-form-item .layui-inline .layui-input-inline {margin-right:4px;}
+    </style>
+  </head>
+  <body>
+    <form class="layui-form" autocomplete="off">
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top:20px;">
+        <legend>派车信息</legend>
+      </fieldset>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>车牌</label>
+          <div class="layui-input-inline">
+            <select name="carNo" lay-verify="carNo" lay-filter="carNo" lay-search>
+              <option value="">直接选择或搜索选择</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>司机</label>
+          <div class="layui-input-inline">
+            <select name="driverName" lay-verify="driverName" lay-filter="driverName" lay-search>
+              <option value="">请选择司机</option>
+            </select>
+            <input type="hidden" name="driverId">
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>司机手机</label>
+          <div class="layui-input-inline">
+            <input type="text" name="driverMobile" lay-verify="driverMobile" placeholder="请输入司机手机" class="layui-input" maxlength="11">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>运费</label>
+          <div class="layui-input-inline">
+            <input type="text" name="freight" lay-verify="freight" placeholder="请输入运费" class="layui-input" maxlength="10">
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label"><span class="required">*</span>预付费用</label>
+          <div class="layui-input-inline">
+            <input type="text" name="prepayFare" lay-verify="prepayFare" placeholder="请输入预付费用" class="layui-input" maxlength="10">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">现金结算</label>
+          <div class="layui-input-inline">
+            <input type="checkbox" name="copeCashFlag" lay-skin="switch" lay-text="是|否">
+          </div>
+        </div>
+      </div>
+      
+      <div class="layui-form-item" style="text-align:center; margin:20px 0 50px;">
+        <button class="layui-btn layui-btn-normal" id="vsubmit" lay-submit lay-filter="submit" style="width:150px;">确认派车</button>
+        <button class="layui-btn layui-btn-primary" id="vclose" type="button" style="width:150px;">取消</button>
+      </div>
+    </form>
+  </body>
+  <script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/lang_zh_CN.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+  <script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+  
+  <script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+  <script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+  <script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+  <script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+  
+  <script>
+    var $id = $.trim(getUrlParam('id'));
+    if($id == null || $id == ''){
+      layui.use('layer', function(){
+        parent.layer.alert('非法参数！', {
+          yes: function(){
+            parent.layer.closeAll();
+          }
+        });
+      });
+    }
+
+    layui.use(['form', 'layer', 'layedit', 'laydate'], function(){
+      var form = layui.form,
+          layer = layui.layer,
+          layedit = layui.layedit,
+          $ = layui.jquery;
+
+      var $carNo = $('select[name="carNo"]'),
+          $dName = $('select[name="driverName"]'),
+          $dMobile = $('input[name="driverMobile"]'),
+          $dId = $('input[name="driverId"]');
+
+      //初始化拖车车牌列表
+      var $trailer = getTrailerList();
+      if($trailer.length > 0){
+        for(var $i = 0; $i < $trailer.length; $i++){
+          $carNo.append('<option value="' + $trailer[$i].carNo + '">' + $trailer[$i].carNo + '</option>');
+        }
+        form.render('select');
+      }
+
+      //获取司机列表
+      var $driver = getDriverList();
+      if($driver.length > 0){
+        for(var $j = 0; $j < $driver.length; $j++){
+          $dName.append('<option value="' + $driver[$j].id + '/' + $driver[$j].name + '/' + $driver[$j].mobile + '">' + $driver[$j].name + '</option>');
+        }
+        form.render('select');
+      }
+
+      form.on('select(carNo)', function(data){
+        var $driverDetail = getDriverByCarNo(data.value);
+        if($driverDetail != null){
+          $dName.val($driverDetail.id + '/' + $driverDetail.name + '/' + $driverDetail.mobile);
+          $dMobile.val($driverDetail.mobile);
+          $dId.val($driverDetail.id);
+        }else{
+          $dName.val('');
+          $dMobile.val('');
+          $dId.val('');
+        }        
+        form.render('select');
+      });
+
+      form.on('select(driverName)', function(data){
+        var $valArrs = data.value.split('/');
+        $dMobile.val($valArrs[2]);
+        $dId.val($valArrs[0]);
+      });
+
+      //自定义验证规则
+      form.verify({
+        carNo: function(val){
+          if(val.length == 0){
+            return '请输入或选择拖车车牌';
+          }
+        },
+        driverName: function(val){
+          if(val.length == 0){
+            return '请选择司机';
+          }
+        },
+        driverMobile: function(val){
+          if(val.length == 0){
+            return '请输入司机手机';
+          }else if(val.length > 11){
+            return '手机号码为11位纯数字';
+          }else if(!$jsReg.mobile.test(val)){
+            return '手机格式不正确';
+          }
+        },
+        freight: function(val){
+          if(val.length == 0){
+            return '请输入运费';
+          }else if(!$jsReg.posNum.test(val)){
+            return '请输入正确的运费';
+          }
+        },
+        prepayFare: function(val){
+          if(val.length == 0){
+            return '请输入预付费用';
+          }else if(!$jsReg.posNum.test(val)){
+            return '请输入正确的预付费用';
+          }
+        }
+      });
+    
+      //监听提交
+      form.on('submit(submit)', function(data){
+        var $copeCashFlag = data.field.copeCashFlag == 'on' ? 1 : 0;
+
+        //数据源
+        var $saveData = {
+          id: parseInt($id),
+          carNo: data.field.carNo,
+          driverName: data.field.driverName.split('/')[1],
+          driverId: parseInt(data.field.driverId),
+          driverMobile: data.field.driverMobile,
+          freight: parseFloat(data.field.freight),
+          prepayFare: parseFloat(data.field.prepayFare),
+          copeCashFlag: $copeCashFlag
+        };
+
+        //console.log($saveData);
+        //return false;
+
+        //保存数据，调用接口
+        $.ajax({
+          type: 'POST', 
+          url: '/ucenter/tms/waybill/waybill/sendCar.shtml', 
+          dataType: "json",      
+          contentType: "application/json",               
+          data: JSON.stringify($saveData), 
+          success: function(d){
+            var $code = d.code,
+                $msg = d.msg,
+                $objects = d.objects;
+                
+            if($code === 'SUCCESS'){
+              parent.layer.alert('派车成功！', {
+                yes: function(){
+                  //关闭窗口
+                  parent.layer.closeAll();
+                  //获取当前框架ID并刷新
+                  var $layId = $(window.parent.document).find('.layui-this').attr('lay-id');
+                  parent['f' + $layId].location.reload();
+                }
+              });
+            }else{
+              parent.layer.msg('派车失败！');
+            }
+          }
+        });
+        return false;
+      });
+
+      //取消按钮
+      $('#vclose').on('click', function(){
+        parent.layer.closeAll();
+      });
+    });
+  </script>
+</html>

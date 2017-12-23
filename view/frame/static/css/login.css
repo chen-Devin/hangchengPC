@@ -1,0 +1,45 @@
+@charset "utf-8";
+/* CSS Document */
+body {background:url(../images/login_bg_5.png) 50% 0 #fff repeat; background-size:100%; height:100%; min-width:800px;}
+.panel-login {width:380px; height:510px; margin:auto; position:relative;}
+.login-title {margin-bottom:30px; height:77px; text-align:center;}
+.login-body {position:absolute; left:0; top:100px; width:100%; height:450px; z-index:300; padding:0 35px; color:#bbb; font-size:13px;}
+.login-mask {position:absolute; left:0; top:100px; width:100%; height:450px; z-index:100; opacity:0.5; filter:alpha(opacity=50); background:#000; border-radius:2px;}
+.login-body .body-title {height:95px; line-height:95px; font-size:18px; text-align:center; letter-spacing:2px; color:#fff;}
+.login-body .form-input {height:46px; width:100%; border:none; padding:0 10px 0 50px; color:#fff; font-size:16px; border:rgba(255,255,255,0.3) 1px solid; outline:none;}
+.login-body .form-input.username {background:url(../images/login_ipt_bg.png) transparent 15px 0 no-repeat; margin-bottom:5px;}
+.login-body .form-input.password {background:url(../images/login_ipt_bg.png) transparent 15px -46px no-repeat;}
+.login-body .form-input.vcode {background:transparent; width:154px; float:left; padding:0 10px;}
+.login-body .form-input.active {border:rgba(255,153,0,1) 1px solid;}
+.login-body .vcode-img {width:86px; height:46px; overflow:hidden; float:left; margin-left:10px; line-height:43px;}
+.login-body .vcode-img img {width:86px; height:36px; vertical-align:middle; cursor: pointer;}
+.login-body .vcode-txt {width:50px; height:46px; overflow:hidden; float:left; margin-left:10px; line-height:46px;}
+.login-body .vcode-txt a {color:#f90;}
+.login-body .vcode-txt a:hover {color:#f60;}
+.login-body .form-submit {height:48px; width:100%; border:none; background:url(../images/login_btn_bg.png) repeat-x; color:#fff; font-size:18px; outline:none; letter-spacing:10px;}
+.login-body .form-submit:hover {background:url(../images/login_btn_bg.png) 0 -48px repeat-x;}
+.login-body .check-box {margin-top:-5px; height:20px; line-height:20px;}
+.login-body .check-box label {font-weight:normal;}
+.login-body .check-box label input {vertical-align:-2px;}
+.login-body a.find-password {color:#bbb; float:right;}
+.login-body a.find-password:hover {color:#f90;}
+.login-body .register {height:40px; line-height:40px; text-align:right;}
+.login-body .register a {color:#f90;}
+.login-body .register a:hover {color:#0382d4;}
+.login-body .error-msg {height:30px; line-height:26px; color:#f00; margin:10px 0;}
+.footer {position:relative; width:100%; height:160px;}
+.footer .footer-body {position:absolute; left:0; top:0; width:100%; height:100%; z-index:300; padding:30px 0; color:#999; font-size:13px;}
+.footer .footer-mask {position:absolute; left:0; top:0; width:100%; height:100%; z-index:100; opacity:0.6; filter:alpha(opacity=60); background:#000;}
+.body-content {width:800px; margin:0 auto; padding:0 15px;}
+.body-content .lefter {float:left; display:inline-block;}
+.body-content .lefter p.txt1 {height:40px; font-size:18px; color:#f90; line-height:normal;}
+.body-content .lefter p.txt1 span {display:block; font-size:12px; color:#666;}
+.body-content .lefter p.txt2 {margin-top:15px; height:20px; line-height:20px;}
+.body-content .lefter p.txt2 a {margin-right:15px; font-size:14px; color:#0382d4;}
+.body-content .lefter p.txt2 a:hover {color:#f90;}
+.body-content .lefter p.txt3 {margin-top:5px; height:20px; line-height:20px; font-size:12px; color:#666;}
+.body-content .lefter p a {margin-top:5px; height:20px; line-height:20px; font-size:12px; color:#666;}
+.body-content .righter {float:right; display:inline-block;}
+.body-content .righter ul li {margin-left:30px; text-align:center; float:left;}
+.body-content .righter ul li span {display:block; height:20px; line-height:30px;}
+#vcode-box {display:none;}

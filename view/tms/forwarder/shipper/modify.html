@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>订单管理 - TMS</title>
+    <link rel="stylesheet" href="/view/frame/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/view/frame/static/css/global.css?v=1.0">
+    <style>
+        .hide {
+            display: none;
+        }
+        /* 强制不换行 */
+        
+        .nowrap {
+            white-space: nowrap;
+        }
+        /* 提示：一些带 .nowrap 的元素可能会破坏布局，因此需要给父容器加 .overflow 来限制 */
+        
+        .overflow {
+            overflow: hidden;
+        }
+        /* 红色星号的“必填”标识，基本跟原来的 span.required 一样 */
+        
+        .layui-form-item--require label::before {
+            content: '*';
+            position: relative;
+            z-index: 10;
+            left: -5px;
+            font-family: 'simsun', '宋体';
+            font-size: 15px;
+            color: #f00;
+        }
+        
+        .layui-form-item .layui-input-inline--small {
+            width: 100px;
+        }
+        /* “危品申报” 的 label 需要大一点 */
+        
+        .layui-form-label-lg {
+            width: 180px;
+        }
+        
+        .layui-form-label-lg+.layui-input-block {
+            margin-left: 220px;
+        }
+    </style>
+    <link rel="stylesheet" href="/view/tms/forwarder/shipper/css/layout.css">
+</head>
+
+<body>
+    <!-- 如果船务信息序号添加序号，则在 form中加上 .shipping-counter-container 类 -->
+    <form class="layui-form" method="post" autocomplete="off" id="myForm">
+        <!-- 主要信息 -->
+        <fieldset class="layui-elem-field" id="mainInfoContainer">
+            <!-- 订单id -->
+            <input type="hidden" name="id">
+
+            <legend>主要信息</legend>
+            <div class="layui-field-box layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">订单编号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="orderNo" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">制单时间</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="makingTime" placeholder="" autocomplete="off" class="layui-input date-time" lay-verify="required" data-time_format="yyyy-MM-dd HH:mm:ss" data-time_value="now" data-time_min="now">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">订单模版</label>
+                            <div class="layui-input-block layui-form" lay-filter="orderTmplContainer">
+                                <!-- 用于保存 orderTemplate 订单模版名称 -->
+                                <input type="hidden" name="orderTemplate">
+                                <select name="orderTemplateId" id="orderTmpl" lay-filter="orderTmpl">
+                                    <option value="" selected>请选择</option>
+                                    <option value="" disabled>数据加载中...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">供应商</label>
+                            <div class="layui-input-block layui-form" lay-filter="supplierContainer">
+                                <!-- 用于保存 carrier 供应商名称 -->
+                                <input type="hidden" name="carrier">
+                                <select name="carrierId" id="supplierList" lay-filter="supplier">
+                                    <option value="" selected>请选择</option>
+                                    <option value="" disabled>数据加载中...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">委托服务</label>
+                            <div class="layui-input-block">
+                                <select name="entrustService" lay-filter="entrustService" lay-verify="required">
+                                    <option value="" selected>请选择</option>
+                                    <option value="1">运输</option>
+                                    <option value="2">关务</option>
+                                    <option value="3">运输,关务</option>
+                                    <option value="4">船务</option>
+                                    <option value="5">运输,代送资料</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-sm8 layui-col-lg9">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">报关方式</label>
+                                    <div class="layui-input-block">
+                                        <select name="brokenStyle" lay-filter="brokenWay" lay-verify="required" id="brokenWaySelect">
+                                            <option value="" selected>请选择</option>
+                                            <option value="1">出口清关</option>
+                                            <option value="2">出口转关</option>
+                                            <option value="3">进口清关</option>
+                                            <option value="4">进口转关</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4 layui-col-lg3">
+                                <div class="layui-form-item overflow">
+                                    <div class="layui-input-inline nowrap" lay-filter="driverBookContainer">
+                                        <input type="checkbox" id="withDriverBookCheckbox" name="isChauffeur" title="携带司机本" lay-skin="primary" lay-filter="driverBook">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item layui-form-item--require">
+                            <label class="layui-form-label">急单类型</label>
+                            <div class="layui-input-block">
+                                <select name="singleType" lay-filter="急单类型" lay-verify="required">
+                                    <option value="" selected>请选择</option>
+                                    <option value="1">正常单</option>
+                                    <option value="2">赶船</option>
+                                    <option value="3">赶补料</option>
+                                    <option value="4">赶截关</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-sm8 layui-col-lg9">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">货物类型</label>
+                                    <div class="layui-input-block">
+                                        <select name="goodsType" lay-filter="goodsType" lay-verify="required">
+                                            <option value="" selected>请选择</option>
+                                            <option value="1">普货</option>
+                                            <option value="2">危品</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4 layui-col-lg3">
+                                <div class="layui-form-item overflow">
+                                    <div class="layui-input-inline nowrap">
+                                        <input type="checkbox" id="requireWeighingCheckbox" name="isRequireWeighing" title="需要过磅" lay-skin="primary">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-sm8 layui-col-lg9">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">运价协议号</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" id="freightAgreementNo" name="freightAgreementNo" placeholder="运输价格协议号" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4 layui-col-lg3">
+                                <div class="layui-form-item overflow">
+                                    <div class="layui-input-inline nowrap">
+                                        <input type="checkbox" id="cashCheckbox" name="isCash" title="现金结算" lay-skin="primary">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">运费协议价格</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="freightAgreePrice" name="freightAgreePrice" placeholder="保留2位小数，最大金额1,000,000" autocomplete="off" class="layui-input" hc-verify="decimals2|max" hc-verify_field="运费协议价格" hc-verify_max="1000000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">报关协议价格</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="brokenAgreePrice" placeholder="保留2位小数，最大金额100,000" autocomplete="off" class="layui-input" hc-verify="decimals2|max" hc-verify_field="报关协议价格" hc-verify_max="100000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">预付款</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="preparePay" placeholder="保留2位小数" autocomplete="off" class="layui-input" hc-verify="decimals2" hc-verify_field="预付款">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 船务信息 -->
+        <div id="shippingContainer">
+            <fieldset class="layui-elem-field shipping-line-container" data-data_type="shipping">
+                <legend>
+                    <span class="shipping-counter"></span> 船务信息
+                    <span class="shipping-icon-container">
+                        <!-- 删除按钮 -->
+                        <i class="layui-icon icon-delete">&#xe640;</i>
+                        <!-- 添加按钮 -->
+                        <i class="layui-icon icon-add">&#xe61f;</i>
+                        <!-- 复制按钮 -->
+                        <span class="icon-copy-container">
+                            <i class="layui-icon icon-copy icon-copy--bg">&#xe621;</i>
+                            <i class="layui-icon icon-copy">&#xe621;</i>
+                        </span>
+                    </span>
+                </legend>
+                <div class="layui-field-box layui-fluid">
+                    <!-- 船务信息 单一表单域部分 -->
+                    <div class="shipping-info-container">
+                        <!-- 船务信息id -->
+                        <input type="hidden" name="id">
+
+                        <div class="layui-row">
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item so-item-container">
+                                    <label class="layui-form-label">S/O No</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="bkNo" placeholder="" autocomplete="off" class="layui-input">
+
+                                        <!-- 附件操作图标有：链接、删除、查看、上传中、上传失败 -->
+                                        <span class="so-attachment-container">
+                                            <i class="layui-icon icon-link" title="上传附件">&#xe64c;</i>
+    
+                                            <!-- js中动态生成的 文件项 结构 -->
+                                            <!-- <span class="so-attachment-item" server_file_name="">
+                                                <i class="layui-icon icon-link-delete" title="删除 %fileName">&#xe640;</i>
+                                                <a target="_blank" class="attachment-name">
+                                                    <i class="layui-icon icon-link-view" title="查看 %fileName">&#xe621;</i>
+                                                </a>
+                                                <span class="status-icon-group">
+                                                    <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop icon-loading" title="%fileName 正在上传中...">&#xe63d;</i>
+                                                    <i class="icon-warn" title="附件 %fileName 上传失败">!</i>
+                                                </span>
+                                        </span> -->
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">船公司</label>
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline layui-form" lay-filter="shippingContainer">
+                                            <!-- 需要一个隐藏域来保存 船公司code（主要因为 option的value被用来存放船名） -->
+                                            <input type="hidden" name="shippingCompCode">
+                                            <select class="shipping-comp-code" id="shipping" lay-filter="shipping">
+                                                <option value="" selected>请选择</option>
+                                                <option value="" disabled>数据加载中...</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="layui-input-inline shipping-comp-shortname">
+                                            <input type="text" name="shippingCompShortname" placeholder="船公司简称" autocomplete="off" class="layui-input" readonly="readonly">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">船名/航次</label>
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="shipName" placeholder="英文船名" autocomplete="off" class="layui-input">
+                                        </div>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="shipTime" placeholder="" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">目的港</label>
+                                    <div class="layui-input-block layui-form" lay-filter="portListContainer">
+                                        <!-- 用于保存 purposePortShortname 目的港简称 -->
+                                        <input type="hidden" name="purposePortShortname">
+                                        <select name="purposePortCode" lay-filter="portList" id="portList">
+                                            <option value="" selected>请选择</option>
+                                            <option value="" disabled>数据加载中...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">提还地点</label>
+                                    <div class="layui-input-block layui-form" lay-filter="wharfListContainer">
+                                        <!-- 用于保存 mentionPlace 提还地点名称 -->
+                                        <input type="hidden" name="mentionPlace">
+                                        <select name="mentionPlaceCode" lay-filter="wharfList" id="wharfList">
+                                            <option value="" selected>请选择</option>
+                                            <option value="" disabled>数据加载中...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">截关时间</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="cutoffTime" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">截重时间</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="cutheavyTime" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">截补料时间</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="cuttingTime" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">截放行时间</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="releaseTime" placeholder="" autocomplete="off" class="layui-input date-time" data-time_unit="1800" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- 船务信息 复合表单域部分：箱型信息 -->
+                    <div class="shipping-box-container">
+                        <!-- 箱型信息 -->
+                        <div class="layui-row box-line-container" data-data_type="box">
+                            <!-- 箱型信息id -->
+                            <input type="hidden" name="id">
+                            <!-- 拖车行需要的字段，默认值为空字符串 -->
+                            <input type="hidden" name="freightPrice" value="" readonly>
+                            <input type="hidden" name="freightGain" value="" readonly>
+
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">箱型/箱量</label>
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline layui-form layui-input-inline--small" lay-filter="boxTypeContainer">
+                                            <!-- 箱型 -->
+                                            <select id="boxTypeList" name="shippingBoxtype" lay-verify="required" lay-filter="boxType">
+                                                <option value="" selected>请选择</option>
+                                                <option value="" disabled>数据加载中...</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="layui-form-mid">*</div>
+
+                                        <div class="layui-input-inline">
+                                            <!-- 箱量 -->
+                                            <input type="text" name="shippingBoxamount" placeholder="整数，0~999之间" maxlength="3" autocomplete="off" class="layui-input" lay-verify="required" hc-verify="integers" hc-verify_field="箱量">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm4">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">摆柜要求</label>
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline layui-form layui-input-inline--small" lay-filter="putRequireContainer">
+                                            <!-- 摆柜要求 -->
+                                            <select name="putRequire" lay-filter="putRequire">
+                                                <option value="0">不限</option>
+                                                <option value="1">摆头</option>
+                                                <option value="2">置中</option>
+                                                <option value="3">摆尾</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="layui-form-mid">单柜货重(KG)</div>
+
+                                        <div class="layui-input-inline">
+                                            <!-- 单柜货重 -->
+                                            <input type="text" name="arkWeight" placeholder="0~100000之间" autocomplete="off" class="layui-input" hc-verify="range" hc-verify_field="单柜货重" hc-verify_max="100000">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm3">
+                                <div class="layui-form-item layui-form-item--require">
+                                    <label class="layui-form-label">做柜时间</label>
+                                    <div class="layui-input-block">
+                                        <!-- 做柜时间 -->
+                                        <input type="text" name="doarkTime" placeholder="" autocomplete="off" class="layui-input date-time" lay-verify="required" data-time_unit="1800" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm1">
+                                <!-- 删除按钮 -->
+                                <i class="layui-icon icon-delete">&#xe640;</i>
+                                <!-- 添加按钮 -->
+                                <i class="layui-icon icon-add">&#xe61f;</i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 船务信息 复合表单域部分：装卸信息 -->
+                    <div class="shipping-address-container">
+                        <!-- 装卸信息 -->
+                        <fieldset class="layui-elem-field layui-field-title">
+                            <legend>装卸信息</legend>
+                            <div class="layui-field-box customer-address-container">
+                                <div class="layui-collapse">
+                                    <!-- 去掉 .layui-colla-item ，防止被 默认初始化为 折叠面板 （因为这里只需要 面板样式，不需要面板功能） -->
+                                    <div class="customer-address-line" data-data_type="address">
+                                        <!-- 装卸信息id -->
+                                        <input type="hidden" name="id">
+
+                                        <h2 class="layui-colla-title">
+                                            装卸地点 <span class="customer-address-counter"></span>
+                                            <span class="address-icon-container">
+                                                <!-- 删除按钮 -->
+                                                <i class="layui-icon icon-delete">&#xe640;</i>
+                                                <!-- 添加按钮 -->
+                                                <i class="layui-icon icon-add">&#xe61f;</i>
+                                                <!-- 复制按钮 -->
+                                                <span class="icon-copy-container">
+                                                    <i class="layui-icon icon-copy icon-copy--bg">&#xe621;</i>
+                                                    <i class="layui-icon icon-copy">&#xe621;</i>
+                                                </span>
+                                            </span>
+                                        </h2>
+                                        <div class="layui-colla-content layui-show layui-fluid">
+                                            <div class="layui-row">
+                                                <div class="layui-col-sm4">
+                                                    <div class="layui-form-item layui-form-item--require">
+                                                        <label class="layui-form-label">装卸地点</label>
+                                                        <div class="layui-input-block layui-form" lay-filter="customerAddressContainer">
+                                                            <!-- 用于保存 orderPlace 装卸地点名称 -->
+                                                            <input type="hidden" name="orderPlace">
+                                                            <select name="customersAddressId" lay-filter="customerAddress" id="customerAddressList" lay-verify="required">
+                                                                <option value="" selected>请选择</option>
+                                                                <option value="" disabled>数据加载中...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-col-sm8">
+                                                    <div class="layui-form-item layui-form-item--require compoment-district" id="userDistrict" data-district_value_field_name="orderAddressAreaid" data-district_text_field_name="orderAddress">
+                                                        <label class="layui-form-label">详细地址</label>
+                                                        <div class="layui-input-block">
+                                                            <div class="layui-input-inline">
+                                                                <select name="province" lay-filter="userProvince" lay-verify="required">
+                                                                    <option value="">请选择</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="layui-input-inline">
+                                                                <select name="city" lay-filter="userCity" lay-verify="required">
+                                                                    <option value="">请选择</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="layui-input-inline">
+                                                                <select name="country" lay-filter="userCounty" lay-verify="required">
+                                                                    <option value="">请选择</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="layui-input-inline">
+                                                                <select name="street" lay-filter="userStreet">
+                                                                    <option value="">请选择</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="layui-input-inline">
+                                                                <input type="text" name="orderAddressDetail" placeholder="详细地址" autocomplete="off" class="layui-input" lay-verify="required">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="layui-row">
+                                                <div class="layui-col-sm4">
+                                                    <div class="layui-form-item layui-form-item--require">
+                                                        <label class="layui-form-label">联系人/电话</label>
+                                                        <div class="layui-inline">
+                                                            <div class="layui-input-inline">
+                                                                <input type="text" name="linkman" placeholder="" autocomplete="off" class="layui-input" lay-verify="required" hc-verify="userName" hc-verify_field="联系人">
+                                                            </div>
+                                                            <div class="layui-input-inline">
+                                                                <input type="text" name="mobile" placeholder="" autocomplete="off" class="layui-input" lay-verify="required" hc-verify="fixCellphone" hc-verify_field="电话">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-col-sm8">
+                                                    <div class="layui-form-item">
+                                                        <label class="layui-form-label">装卸备注</label>
+                                                        <div class="layui-input-block">
+                                                            <input type="text" name="remark" placeholder="" autocomplete="off" class="layui-input">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="layui-colla-item">
+                                        <h2 class="layui-colla-title">当作panel用</h2>
+                                        <div class="layui-colla-content layui-show">内容区域</div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- 报关资料送至（报关行联系信息） -->
+        <fieldset class="layui-elem-field hide" id="brokerDataContainer">
+            <legend>报关资料送至</legend>
+            <div class="layui-field-box layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">报关行</label>
+                            <div class="layui-input-block layui-form" lay-filter="brokerListContainer">
+                                <!-- 用于保存 brokenName 报关行名称 -->
+                                <input type="hidden" name="brokenName">
+                                <select name="customersBrokerId" id="brokerList" lay-filter="brokerList">
+                                    <option value="" selected>请选择</option>
+                                    <option value="" disabled>数据加载中...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm8">
+                        <div class="layui-form-item compoment-district" id="deliveryAddress" data-district_value_field_name="brokenAreaId" data-district_text_field_name="brokenAreaAddress">
+                            <label class="layui-form-label">送达地址</label>
+                            <div class="layui-input-block">
+                                <div class="layui-input-inline">
+                                    <select name="deliveryProvince" lay-filter="deliveryProvince">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <select name="deliveryCity" lay-filter="deliveryCity">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <select name="deliveryCountry" lay-filter="deliveryCounty">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <select name="deliveryStreet" lay-filter="deliveryStreet">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+
+                                <div class="layui-input-inline">
+                                    <input type="text" name="brokenAddress" placeholder="详细地址" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">联系人</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="brokenLinkman" placeholder="" autocomplete="off" class="layui-input" hc-verify="userName" hc-verify_field="联系人">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">手机/电话</label>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="brokenMobile" placeholder="" autocomplete="off" class="layui-input" hc-verify="mobile" hc-verify_field="手机">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="brokenTel" placeholder="" autocomplete="off" class="layui-input" hc-verify="fixCellphone" hc-verify_field="电话">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">传真号码</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="brokenFax" placeholder="" autocomplete="off" class="layui-input" hc-verify="fixCellphone" hc-verify_field="传真号码">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 报关信息 -->
+        <fieldset class="layui-elem-field hide" id="brokerInfoContainer" data-attachment_type="1">
+            <legend>报关信息</legend>
+            <div class="layui-field-box layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm8">
+                        <div class="layui-row">
+                            <div class="layui-col-sm6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">申报方式</label>
+                                    <div class="layui-input-block">
+                                        <select name="declarationStyle" lay-filter="申报方式">
+                                            <option value="" selected>请选择</option>
+                                            <option value="0">有纸申报</option>
+                                            <option value="W">无纸申报</option>
+                                            <option value="M">通关无纸化</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-sm6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">申报日期</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="declarationDate" placeholder="" autocomplete="off" class="layui-input date-time" data-time_type="date" data-time_format="yyyy-MM-dd" data-time_min="now">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">报关委托书</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="bailmentBook">
+                                            <!-- 
+                                            因为用到了 .file-line:empty 选择器，所以 .file-line 元素内不能包含子元素（包括文本节点），但可以包含注释节点
+                                         -->
+                                            <!-- 
+                                            <div class="file-item">
+                                                <span><i class="layui-icon icon-file">&#xe60a;</i></span>
+                                                <a target="_blank" class="file-name">报关委托书.docx</a>
+                                                <span class="icon-delete"></span>
+                                                <span class="status-icon-group">
+                                                    <i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop icon-loading" title="文件上传中...">&#xe63d;</i>
+                                                    <i class="icon-warn" title="文件上传失败">!</i>
+                                                </span>
+                                                <span class="file-name hide">%fileName</span>
+                                            </div>
+                                         --></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">申报要素</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="declaration"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">装箱单</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="vanningBill"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">发票</label>
+                                    <div class="layui-input-inline" style="width: 50%;">
+                                        <div class="file-line" data-attachment_name="invoice"></div>
+                                        <div class="file-control-group" style="margin-left: 340px;">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-mid nowrap" style="width: 30%; color: red;">发票金额超过[5W]美金需提供相关证明信息或进行拆单</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">合同</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="contract"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-sm4">
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">申报要素</label>
+                            <div class="layui-input-block">
+                                <textarea name="declarationElements" placeholder="请输入内容" class="layui-textarea" style="min-height: 300px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 危品申报 -->
+        <fieldset class="layui-elem-field hide" id="dangerousGoodsContainer" data-attachment_type="2">
+            <legend>危品申报</legend>
+            <div class="layui-field-box layui-fluid">
+                <div class="layui-row">
+                    <div class="layui-col-sm11">
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label layui-form-label-lg nowrap">危险品包装容器使用鉴定结果单</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="identification"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label layui-form-label-lg nowrap">危险品包装容器性能检验结果单</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="verification"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label layui-form-label-lg nowrap">安全适运申报单</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="safetyTransportation"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label layui-form-label-lg nowrap">包装危险货物技术说明书</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="specification"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row">
+                            <div class="layui-col-sm12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label layui-form-label-lg nowrap">船舶载运危险品货物申报单</label>
+                                    <div class="layui-input-block">
+                                        <div class="file-line" data-attachment_name="dangerousGoods"></div>
+                                        <div class="file-control-group">
+                                            <a href="#" class="file-control-upload">上传</a>
+                                            <a href="#" class="file-control-download">模版</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-sm1">
+                        <!-- 为上传按钮留位 -->
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 订单备注 -->
+        <div class="layui-form-item layui-form-text" id="orderRemarkContainer">
+            <label class="layui-form-label">订单备注</label>
+            <div class="layui-input-block">
+                <textarea name="remark" id="remarkTextarea" placeholder="委托注意事项" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <!-- 操作按钮区 -->
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="checkbox" title="继续新增" lay-skin="primary" id="continueAddCheckbox">
+                </div>
+                <button class="layui-btn layui-btn-normal" lay-submit lay-filter="save">保存</button>
+                <button class="layui-btn" lay-submit lay-filter="saveAndEntrust">保存并委托</button>
+                <button type="layui-btn" class="layui-btn layui-btn-danger" id="cancelButton">取消</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <button class="layui-btn layui-btn-primary" id="testFormData">打印测试表单数据</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- 进度条元素，用于 初始化加载数据的遮罩层 -->
+    <div id="progressContent" style="display: none; padding: 20px; background: #8ACBFF;">
+        <span class="loading-content-text">加载中...</span>
+        <div class="layui-progress layui-progress-big" lay-filter="loadDataProgress" lay-showPercent="true" id="loadDataProgress" style="background: white;">
+            <div class="layui-progress-bar layui-bg-blue" lay-percent="15%"></div>
+        </div>
+    </div>
+</body>
+<script charset="utf-8" src="/view/frame/layui/layui.js"></script>
+<script charset="utf-8" src="/view/frame/static/js/jquery.min.js?v=1.0"></script>
+<script charset="utf-8" src="/view/tms/static/js/tms_index.js?v=1219"></script>
+<!-- 为了使用 layui.tms_tab 模块，需要引入 tms_tab.js -->
+<script charset="utf-8" src="/view/tms/static/js/tms_tab.js?v=1.0"></script>
+<script charset="utf-8" src="/view/frame/static/js/layui.district.js?v=1.0"></script>
+
+<!-- 错误代码集合 -->
+<script charset="utf-8" src="/view/frame/static/js/errorCodeMap.js"></script>
+<!-- 底层工具库 -->
+<script charset="utf-8" src="/view/frame/static/js/HC.js?v=1.4"></script>
+<!-- 统一规则校验器 -->
+<script charset="utf-8" src="/view/tms/static/js/validator.js"></script>
+<!-- 基础业务工具方法 -->
+<script charset="utf-8" src="/view/tms/static/js/bizUtil.js"></script>
+<!-- 订单相关的公共代码 -->
+<script charset="utf-8" src="../js/orderCommon.js"></script>
+
+<!-- 本页面的js -->
+<script charset="utf-8" src="./js/add.js"></script>
+
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册：填写个人信息 - TMS</title>
+    <link rel="stylesheet" href="../frame/3.3.7/css/bootstrap.min.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/regist.css?v=1.0">
+</head>
+
+<body>
+    <!-- Start:头部 -->
+    <div class="panel-head">
+        <div class="panel-logo">
+            <div class="panel-left"><img src="../frame/static/images/logo.png"><span>用户注册</span></div>
+            <div class="panel-right">已有账号？<a href="/">立即登录</a></div>
+        </div>
+    </div>
+    <!-- End:头部 -->
+
+    <!-- Start:内容 -->
+    <div class="panel-main">
+        <!-- Start:步骤2-2 个人注册 -->
+        <div class="panel-register" id="register-step2-2">
+            <a href="javascript:;" class="cut_btn">切换企业用户</a>
+            <div class="steps-list">
+                <ul class="step2">
+                    <li>1、填写账户信息</li>
+                    <li>2、填写详细信息</li>
+                    <li>3、平台审核</li>
+                </ul>
+            </div>
+            <div class="register-body">
+                <div class="reg-txt">
+                    <p class="txt1">
+                        <span>温馨提示：</span><br> 1、请按照你的身份证如实填写以下内容，这是审核你开通账号的重要信息，且一经审核，将不可变更。
+                        <br> 2、有企业营业执照的企业用户请注册企业账户。
+                    </p>
+                    <p class="txt2">审核不通过备注：个人信息与身份证图片内容不符，请认真填写。</p>
+                </div>
+                <form action="register3.html" method="post">
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>个人信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>身份证号码</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" placeholder="请输入身份证号码">
+                                <span class="form-error">6位数字和字母组成</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>姓名</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" placeholder="请输入真实姓名">
+                                <span class="form-error">4-20位字符，支持字母和数字，设置成功无法更改</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>户口所在地</div>
+                            <div class="form-group">
+                                <select class="form-select" style="margin:0;">
+                  <option>选择省</option>
+                  <option value="1">广东省</option>
+                  <option value="2">山东省</option>
+                </select>
+                                <select class="form-select">
+                  <option>选择市</option>
+                  <option value="1">深圳市</option>
+                  <option value="2">广州市</option>
+                </select>
+                                <select class="form-select" style="min-width:109px;">
+                  <option>选择区/县</option>
+                  <option value="1">罗湖区</option>
+                  <option value="2">福田区</option>
+                </select>
+                                <select class="form-select">
+                  <option>选择街道/镇</option>
+                  <option value="1">沙头街道</option>
+                  <option value="2">布吉街道</option>
+                </select>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>详细地址</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" placeholder="请输入详细地址">
+                                <span class="form-error">支持1开头的11位数字</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>身份证正面图片</div>
+                            <div class="form-group">
+                                <div>
+                                    <input type="file" id="" class="fl">
+                                    <span class="form-error lh">格式支持JPG/PNG/PDF，大小不超过4M</span>
+                                    <input type="hidden" id="img-url">
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="form-img">
+                                    <a href="/view/images/test_img.png" target="_blank" title="点击查看大图"><img src="/view/images/test_img.png" alt="点击查看大图"></a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>身份证反面图片</div>
+                            <div class="form-group">
+                                <div>
+                                    <input type="file" id="" class="fl">
+                                    <span class="form-error lh">格式支持JPG/PNG/PDF，大小不超过4M</span>
+                                    <input type="hidden" id="img-url">
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="form-img">
+                                    <a href="/view/images/test_img.png" target="_blank" title="点击查看大图"><img src="/view/images/test_img.png" alt="点击查看大图"></a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>业务角色</div>
+                            <div class="form-group">
+                                <select class="form-select w-335" style="margin:0;">
+                  <option>请选择业务角色</option>
+                  <option value="1">财务</option>
+                  <option value="2">业务</option>
+                </select>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>业务经营范围</div>
+                            <div class="form-group">
+                                <div class="w-335 fl">
+                                    <label><input type="checkbox"> 陆运</label>
+                                    <label><input type="checkbox"> 订舱</label>
+                                    <label><input type="checkbox"> 报关</label>
+                                    <label><input type="checkbox"> 陆运</label>
+                                    <label><input type="checkbox"> 订舱</label>
+                                    <label><input type="checkbox"> 报关</label>
+                                    <label><input type="checkbox"> 陆运</label>
+                                    <label><input type="checkbox"> 订舱</label>
+                                </div>
+                                <span class="form-error lh"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>注册人联系信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>注册人姓名</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" placeholder="请输入注册人姓名">
+                                <span class="form-error check">6位数字和字母组成</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>手机号</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" disabled="disabled" value="136****6071">
+                                <span class="form-error">4-20位字符，支持字母和数字，设置成功无法更改</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title">联系邮箱</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="test1" placeholder="请输入联系邮箱">
+                                <span class="form-error">6-20位字符，由大写字母、小写字母和数字两种以上组合</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dd>
+                            <div class="form-title">&nbsp;</div>
+                            <div class="form-group">
+                                <button type="submit" class="form-submit" id="step1-btn" style="margin:0;">立即提交</button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+        <!-- End:步骤2-2 个人注册 -->
+    </div>
+    <!-- End:内容 -->
+
+    <!-- Start:底部 -->
+    <div class="panel-foot">
+        <div class="panel-bottom">
+            <p class="txt1"><a href="aboutUs.html" target="_blank">关于我们</a>|<a href="news.html" target="_blank">新闻动态</a>|<a href="contact.html" target="_blank">联系我们</a>|<a href="help.html" target="_blank">帮助中心</a></p>
+            <p class="txt2">&copy; 2017 - 2020 TMS. All Rights Reserved　粤ICP备17154150号-11</p>
+        </div>
+    </div>
+    <!-- End:底部 -->
+</body>
+<script type="text/javascript" src="../frame/static/js/jquery.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/regist.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/comm.js?v=1.0"></script>
+<script>
+    $(function() {
+        $('.cut_btn').on('click', function() {
+            window.location.href = 'register2-1.html';
+        });
+
+        regisitStep2_2();
+    });
+</script>
+
+</html>

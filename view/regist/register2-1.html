@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册：填写企业信息 - TMS</title>
+    <link rel="stylesheet" href="../frame/3.3.7/css/bootstrap.min.css?v=1.0">
+    <link rel="stylesheet" href="../frame/layui/css/layui.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/global.css?v=1.0">
+    <link rel="stylesheet" href="../frame/static/css/regist.css?v=1.0">
+</head>
+
+<body>
+    <!-- Start:头部 -->
+    <div class="panel-head">
+        <div class="panel-logo">
+            <div class="panel-left"><img src="../frame/static/images/logo.png"><span>用户注册</span></div>
+            <div class="panel-right">已有账号？<a href="/">立即登录</a></div>
+        </div>
+    </div>
+    <!-- End:头部 -->
+
+    <!-- Start:内容 -->
+    <div class="panel-main">
+        <!-- Start:步骤2-1 企业注册 -->
+        <div class="panel-register" id="register-step2-1">
+            <a href="javascript:;" class="cut_btn">切换个人用户</a>
+            <div class="steps-list">
+                <ul class="step2">
+                    <li>1、填写账户信息</li>
+                    <li>2、填写详细信息</li>
+                    <li>3、平台审核</li>
+                </ul>
+            </div>
+            <div class="register-body">
+                <div class="reg-txt">
+                    <p class="txt1">
+                        <span>温馨提示：</span><br> 1、请按照你的营业执照如实填写以下内容，这是审核你开通账号的重要信息，且一经审核，将不可变更。
+                        <br> 2、无企业营业执照的个人用户请注册个人账户。
+                    </p>
+                    <p class="txt2" id="no-pass" style="display:none;">审核不通过备注：企业信息与营业执照图片内容不符，请认真填写。</p>
+                </div>
+                <form method="post" autocomplete="off" id="form-regist">
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>企业信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>统一社会信用代码</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="socialCode" name="socialCode" maxlength="18" placeholder="请输入统一社会信用代码">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>公司名称</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="companyFullName" name="companyFullName" maxlength="50" placeholder="请输入公司名称">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>公司简称</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="companyShortName" name="companyShortName" maxlength="20" placeholder="请输入公司简称">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>公司所在地</div>
+                            <div class="form-group">
+                                <input type="hidden" id="areaId" name="areaId">
+                                <div id="district">
+                                    <select class="form-select" id="province" name="province" style="margin:0;">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="city" name="city">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="county" name="county">
+                    <option value="">请选择</option>
+                  </select>
+                                    <select class="form-select" id="street" name="street">
+                    <option value="">请选择</option>
+                  </select>
+                                </div>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>详细地址</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="address" name="address" placeholder="请输入详细地址">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>营业期限</div>
+                            <div class="form-group">
+                                <div class="w-335" style="float:left;" id="deadline">
+                                    <div class="layui-input-inline" style="width:160px;">
+                                        <input type="text" name="dateB" id="dateB" lay-verify="date" placeholder="开始时间" autocomplete="off" class="layui-input">
+                                    </div>
+                                    -
+                                    <div class="layui-input-inline" style="width:161px;">
+                                        <input type="text" name="dateE" id="dateE" lay-verify="date" placeholder="结束时间" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>营业执照图片</div>
+                            <div class="form-group">
+                                <input type="hidden" id="imgUrl" name="imgUrl">
+                                <div class="layui-upload w-335" style="float:left;">
+                                    <div style="width:100%; padding:15px 0; border:#ddd 1px dotted; text-align:center;">
+                                        <button type="button" class="layui-btn layui-btn-normal" id="upload-btn">上传营业执照</button>
+                                        <div class="layui-upload-box" id="upload-imgs">预览图</div>
+                                    </div>
+                                </div>
+                                <span class="form-error lh">格式支持JPG/PNG/GIF/BMP/JPEG，大小不超过4M</span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>业务角色</div>
+                            <div class="form-group">
+                                <select class="form-select w-335" style="margin:0;" id="businessRole" name="businessRole">
+                  <option value="">请选择业务角色</option>
+                </select>
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title lh"><span>*</span>业务范围</div>
+                            <div class="form-group">
+                                <input type="hidden" id="businessScope" name="businessScope">
+                                <div class="w-335 fl" id="scope-box"></div>
+                                <span class="form-error lh"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl style="border-bottom:#ddd 1px dotted;">
+                        <dt><h1>注册人联系信息</h1></dt>
+                        <dd>
+                            <div class="form-title"><span>*</span>注册人姓名</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="trueName" name="trueName" maxlength="10" placeholder="请输入注册人姓名">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title"><span>*</span>手机号</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="mobile" name="mobile" disabled="disabled" style="background:#efefef;">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                        <dd>
+                            <div class="form-title">联系邮箱</div>
+                            <div class="form-group">
+                                <input type="text" class="form-input" id="email" name="email" placeholder="请输入联系邮箱">
+                                <span class="form-error"></span>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dd>
+                            <div class="form-title">&nbsp;</div>
+                            <div class="form-group">
+                                <button type="button" class="form-submit" id="step1-btn" style="margin:0;">立即提交</button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+        <!-- End:步骤2-1 企业注册 -->
+    </div>
+    <!-- End:内容 -->
+
+    <!-- Start:底部 -->
+    <div class="panel-foot">
+        <div class="panel-bottom">
+            <p class="txt1"><a href="http://www.hcwanli.com/gongsijianjie/" target="_blank">关于我们</a>|<a href="http://www.hcwanli.com/xinpinshangxian/" target="_blank">新闻动态</a>|<a href="http://www.hcwanli.com/lianxiwomen/" target="_blank">联系我们</a>|<a href="http://www.hcwanli.com/bangzhuzhongxin/"
+                    target="_blank">帮助中心</a></p>
+            <p class="txt2">&copy; 2017 - 2020 广东航程科技有限公司. All Rights Reserved　<a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备17154150号-11</a></p>
+        </div>
+    </div>
+    <!-- End:底部 -->
+</body>
+<script type="text/javascript" src="../frame/static/js/jquery.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/jquery.cookie.min.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/layui/layui.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/comm.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/lang_zh_CN.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/district.js?v=1.0"></script>
+<script type="text/javascript" src="../frame/static/js/regist.js?v=1.0"></script>
+<script>
+    $(function() {
+        $(".panel-register").data("bodyType", "1"); //企业
+        $('.cut_btn').on('click', function() {
+            window.location.href = 'register2-2.html';
+        });
+        regisitStep2_1();
+
+        var _verificationImg = function($obj, $objVal, $txt) {
+            if ($objVal.length == 0) {
+                checkResult($obj, $txt.errorMsg1, 2);
+                return false;
+            } else {
+                checkResult($obj, '', 3);
+                return true;
+            }
+        }
+
+        var compareTime = function(bTime, eTime) {
+            var b = typeof bTime === "number" ? bTime : Date.parse(new Date(bTime));
+            var e = typeof eTime === "number" ? eTime : Date.parse(new Date(eTime));
+            return b - e;
+        }
+
+        //change时，对日期作校验
+        var _beginTime = "";
+        var _endTime = "";
+        var _validateTime = function() {
+            var today = new Date().format("yyyy-MM-dd");
+
+            if (_beginTime.length == 0 || _endTime.length == 0) {
+                checkResult($("#deadline"), $jsLang.deadline.errorMsg1, 2);
+
+            } else if (compareTime(_beginTime, _endTime) > 0) {
+                checkResult($("#deadline"), "开始时间不能大于结束时间", 2);
+
+            } else if (compareTime(_beginTime, today) > 0) {
+                checkResult($("#deadline"), "开始时间不能大于当前时间", 2);
+
+            } else if (compareTime(_endTime, today) < 0) {
+                checkResult($("#deadline"), "结束时间不能小于当前时间", 2);
+
+            } else {
+                checkResult($("#deadline"), '', 3);
+            }
+        }
+
+        $("#dateB, #dateE").on("change", function() {
+            _beginTime = $("#dateB").val();
+            _endTime = $("#dateE").val()
+            _validateTime();
+        });
+
+
+        //layui框架：日期，图片上传
+        layui.use(['upload', 'layer', 'laydate'], function() {
+            var $ = layui.jquery,
+                upload = layui.upload,
+                layer = layui.layer,
+                laydate = layui.laydate;
+
+            //日期
+            laydate.render({
+                elem: '#dateB',
+                lang: 'cn',
+                max: 0,
+                done: function(value, date, endDate) {
+                    _beginTime = value;
+                    _validateTime();
+                }
+            });
+            laydate.render({
+                elem: '#dateE',
+                lang: 'cn',
+                min: 0,
+                done: function(value, date, endDate) {
+                    _endTime = value;
+                    _validateTime();
+                }
+            });
+
+            //图片上传
+            upload.render({
+                elem: '#upload-btn',
+                url: '/ucenter/upload.shtml',
+                multiple: false,
+                // exts: 'jpg|png|gif',
+                exts: 'jpg|png|gif|bmp|jpeg',
+                size: 4096,
+                before: function(obj) {
+                    layer.load();
+                    obj.preview(function(index, file, result) {
+                        $('#upload-imgs').html('<a href="' + result + '" target="_blank"><img src="' + result + '" alt="' + file.name + '" class="layui-upload-img"></a>');
+                    });
+                    $('#upload-btn').html('重新上传');
+                },
+                //上传完毕
+                done: function(res) {
+                    layer.closeAll('loading');
+                    // var $imgUrl = $.trim($('#imgUrl').val());
+                    // $imgUrl += res.objects + ',';
+                    $('#imgUrl').val(res.objects);
+                    _verificationImg($('#imgUrl'), res.objects + "", $jsLang.imgUrl);
+                    layer.msg('上传成功');
+                },
+                //上传失败
+                error: function(index, upload) {
+                    layer.closeAll('loading');
+                    $('#imgUrl').val("");
+                    _verificationImg($('#imgUrl'), "", $jsLang.imgUrl);
+                    layer.msg('上传失败，请重新上传');
+                }
+            });
+
+        });
+    });
+</script>
+
+</html>
